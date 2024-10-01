@@ -42,17 +42,28 @@ public class database {
         //response.setContentType("text/html;charset=UTF-8");
         
         String query;
-  
-            
-        Class.forName("org.apache.derby.jdbc.ClientDriver");
+        boolean isAuth = false; 
+        
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
 
         // create a database connection
-        connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
-        boolean isAuth = false; 
-        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1,user);
-        statement.setString(2,password);
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1,user);
+            statement.setString(2,password);
+            
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) isAuth = true;
+        }
+        catch (ClassNotFoundException e) {
+            System.out.println("ClassNotFoundException: " + e.getMessage());
+        }
+        catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        }            
+        
         return isAuth;
     }
 }
