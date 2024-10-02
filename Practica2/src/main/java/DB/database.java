@@ -49,7 +49,7 @@ public class database {
 
         // create a database connection
             connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
-            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+            String sql = "SELECT * FROM USUARIOS WHERE ID_USUARIO = ? AND PASSWORD = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1,user);
             statement.setString(2,password);
