@@ -9,9 +9,15 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Menu</title>
     </head>
     <body>
-        <h1>menu!</h1>
+        <h1>Menu!</h1>
+        <form action="menu" method="post">
+            <button type="submit" name="regImagen">Registrar imagen</button>
+            <button type="submit" name="modImagen">Modificar imagen</button>
+            <button type="submit" name="busImagen">Buscar imagen</button>
+            <button type="submit" name="elimImagen" >Eliminar imagen</button>
+        </form>
     </body>
 </html>
