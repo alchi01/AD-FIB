@@ -87,6 +87,7 @@ public class login extends HttpServlet {
             rd.forward(request, response);
         } 
         else {
+            request.setAttribute("TError", "login_error");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
         }

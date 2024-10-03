@@ -9,9 +9,17 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>ERROR</title>
     </head>
     <body>
-        <h1>error</h1>
+        <% String TError = (String) request.getAttribute("TError");%> 
+        
+        <% if (TError.equals("login_error")) {%>
+            <h2>Error: Wrong username and/or password. <h2>
+             <button onclick="location.href='login.jsp'">Try again</button>
+        <% } else { %>
+            <h2> Error registering, modifying or removing the image. <h2>
+            <button onclick="location.href='menu.jsp'">Return to menu</button>
+        <% } %>
     </body>
 </html>
