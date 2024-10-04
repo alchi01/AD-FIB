@@ -17,7 +17,7 @@
         <% if (TError.equals("login_error")) {%>
             <h2>Error: Wrong username and/or password. <h2>
              <button onclick="location.href='login.jsp'">Try again</button>
-        <% } else { %>
+        <% } else if (TError.equals("image_error")) { %>
             <h2> Error registering, modifying or removing the image. <h2>
             <button onclick="location.href='menu.jsp'">Return to menu</button>
         <% } %>

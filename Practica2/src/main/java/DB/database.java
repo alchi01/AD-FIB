@@ -41,7 +41,6 @@ public class database {
         Connection connection = null;
         //response.setContentType("text/html;charset=UTF-8");
         
-        String query;
         boolean isAuth = false; 
         
         try {
@@ -62,8 +61,46 @@ public class database {
         }
         catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
-        }            
+        }finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                // connection close failed.
+                System.err.println(e.getMessage());
+           }
+        }
         
         return isAuth;
+    }
+    
+    public boolean imageupload(String titulo,String description,String author,String fechaCapt,String fechaGuard,String fileName) {
+        boolean okimage = false;
+        
+        Connection connection = null;
+        //response.setContentType("text/html;charset=UTF-8");
+        
+        
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+            //String sql = "INSERT INTO "
+         }
+        catch (ClassNotFoundException e) {
+            System.out.println("ClassNotFoundException: " + e.getMessage());
+        }
+        catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        }finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                // connection close failed.
+                System.err.println(e.getMessage());
+           }
+        }
     }
 }

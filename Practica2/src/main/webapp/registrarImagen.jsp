@@ -9,9 +9,17 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Register</title>
     </head>
     <body>
-        <h1>Registrar Imagen!</h1>
+        <h1>Registrar Imagen</h1>
+        <form action = "registrarImagen" method = "POST">
+            <input type="text" name="Titulo">
+            <input type="text" name="Descripcion">
+            <input type="text" name="Autor">
+            <input type="date" name="Fecha de creacion">
+            <input type="file" name="Subir Imagen">
+            <input type="submit" value="Subir la imagen">
+        </form>
     </body>
 </html>
