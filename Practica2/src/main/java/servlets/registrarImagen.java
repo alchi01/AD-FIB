@@ -92,9 +92,9 @@ public class registrarImagen extends HttpServlet {
         
         database db  = new database();
         
-        boolean okimage = db.imageupload(titulo, description,author,fechaCapt,fechaGuard,fileName); 
+        boolean okImage = db.image_upload(titulo, description,author,fechaCapt,fechaGuard,fileName); 
         
-        if (okimage) {
+        if (okImage) {
             RequestDispatcher rd = request.getRequestDispatcher("/menu.jsp");
             rd.forward(request, response);
         } else {

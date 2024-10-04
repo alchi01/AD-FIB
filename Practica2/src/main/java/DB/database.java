@@ -75,8 +75,8 @@ public class database {
         return isAuth;
     }
     
-    public boolean imageupload(String titulo,String description,String author,String fechaCapt,String fechaGuard,String fileName) {
-        boolean okimage = false;
+    public boolean image_upload(String titulo,String description,String author,String fechaCapt,String fechaGuard,String fileName) {
+        boolean okImage = false;
         
         Connection connection = null;
         //response.setContentType("text/html;charset=UTF-8");
@@ -102,5 +102,6 @@ public class database {
                 System.err.println(e.getMessage());
            }
         }
+        return okImage;
     }
 }
