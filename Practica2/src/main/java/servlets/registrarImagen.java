@@ -5,18 +5,21 @@
 package servlets;
 
 import java.io.IOException;
+import java.io.File;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import jakarta.servlet.RequestDispatcher;
+import java.io.File;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import java.nio.file.Files;
 import DB.database;
-import jakarta.servlet.RequestDispatcher;
 
 /**
  *
@@ -78,6 +81,7 @@ public class registrarImagen extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        boolean error = true;
         String titulo = request.getParameter("Titulo");
         String description = request.getParameter("Description");
         String author = request.getParameter("Author");
@@ -89,18 +93,29 @@ public class registrarImagen extends HttpServlet {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String fechaGuard = fecha.format(format);
         
+        String UPLOAD_DIRECTORY = "C:/uploads";
         
+        String uploadPath = UPLOAD_DIRECTORY + File.separator + fileName;
+        System.out.println("Archivo guardado en: " + uploadPath);
+        File file = new File(uploadPath);
+        try (InputStream input = filePart.getInputStream()) {
+            Files.copy(input, file.toPath());
+            System.out.println("Archivo " + fileName + " ha sido subido corectamente");
+            error = false;
+        }
         database db  = new database();
         
         boolean okImage = db.image_upload(titulo, description,author,fechaCapt,fechaGuard,fileName); 
         
-        if (okImage) {
-            RequestDispatcher rd = request.getRequestDispatcher("/menu.jsp");
-            rd.forward(request, response);
-        } else {
-            request.setAttribute("TError", "image_error");
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.forward(request, response);
+        if (!error) {
+            if (okImage) {
+                RequestDispatcher rd = request.getRequestDispatcher("/menu.jsp");
+                rd.forward(request, response);
+            } else {
+                request.setAttribute("TError", "image_error");
+                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+                rd.forward(request, response);
+            }
         }
     }
 

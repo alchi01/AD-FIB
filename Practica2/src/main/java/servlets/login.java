@@ -77,8 +77,8 @@ public class login extends HttpServlet {
         
         database db  = new database();
  
-        String username = request.getParameter("user");
-        String passwords = request.getParameter("password");
+        String username = request.getParameter("User");
+        String passwords = request.getParameter("Password");
         
         boolean auth = db.login(username,passwords);
         
