@@ -75,17 +75,31 @@ public class database {
         return isAuth;
     }
     
-    public boolean image_upload(String titulo,String description,String author,String fechaCapt,String fechaGuard,String fileName) {
+    public boolean image_upload(String titulo,String description,String keywords, String author,String user, String fechaCapt,String fechaGuard,String fileName) {
         boolean okImage = false;
         
         Connection connection = null;
         //response.setContentType("text/html;charset=UTF-8");
         
-        
         try {
             Class.forName("org.apache.derby.jdbc.ClientDriver");
             connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
-            //String sql = "INSERT INTO "
+            connection.setAutoCommit(false); // Set auto-commit to false
+            String sql = "INSERT INTO IMAGE (title, description, keywords ,author, creator, capture_date, storage_date, filename) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1,titulo);
+            statement.setString(2,description);
+            statement.setString(3,keywords);
+            statement.setString(4,author);
+            statement.setString(5,user);
+            statement.setString(6,fechaCapt);
+            statement.setString(7,fechaGuard);
+            statement.setString(8,fileName);
+            okImage = true;
+            statement.executeUpdate();
+            connection.commit(); // Commit the transaction
+        
+            
          }
         catch (ClassNotFoundException e) {
             System.out.println("ClassNotFoundException: " + e.getMessage());

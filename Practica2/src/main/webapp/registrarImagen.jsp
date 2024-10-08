@@ -13,12 +13,25 @@
     </head>
     <body>
         <h1>Registrar Imagen</h1>
-        <form action = "registrarImagen" method = "POST">
+        <form action = "registrarImagen" method = "POST" enctype="multipart/form-data">
+            <label for="titulo">Título:</label>
             <input type="text" name="Titulo">
+            <br><br>
+            <label for="descripcion">Descripcion:</label>
             <input type="text" name="Descripcion">
+            <br><br>
+            <label for="descripcion">Palabra clave:</label>
+            <input type="text" name="Keywords">
+            <br><br>
+            <label for="autor">Autor:</label>
             <input type="text" name="Autor">
+            <br><br>
+            <label for="fecha de creacion">Fecha de creacion:</label>
             <input type="date" name="Fecha de creacion">
+            <br><br>
+            <label for="file">Imagen:</label>
             <input type="file" name="Subir Imagen">
+            <br><br>
             <input type="submit" value="Subir la imagen">
         </form>
     </body>

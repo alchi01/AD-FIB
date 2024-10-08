@@ -11,13 +11,14 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import jakarta.servlet.RequestDispatcher;
-import java.io.File;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import jakarta.servlet.http.HttpSession;
 import java.nio.file.Files;
 import DB.database;
 
@@ -25,9 +26,15 @@ import DB.database;
  *
  * @author alumne
  */
+
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+                 maxFileSize = 1024 * 1024 * 10,      // 10MB
+                 maxRequestSize = 1024 * 1024 * 50)   // 50MB
+
 @WebServlet(name = "registrarImagen", urlPatterns = {"/registrarImagen"})
 public class registrarImagen extends HttpServlet {
 
+ 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -80,12 +87,12 @@ public class registrarImagen extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
         boolean error = true;
         String titulo = request.getParameter("Titulo");
-        String description = request.getParameter("Description");
-        String author = request.getParameter("Author");
-        String fechaCapt = request.getParameter("Fecha de creación");
+        String description = request.getParameter("Descripcion");
+        String keywords = request.getParameter("Keywords");
+        String author = request.getParameter("Autor");
+        String fechaCapt = request.getParameter("Fecha de creacion");
         Part filePart= request.getPart("Subir Imagen");
         String fileName = filePart.getSubmittedFileName();
         
@@ -93,9 +100,9 @@ public class registrarImagen extends HttpServlet {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String fechaGuard = fecha.format(format);
         
-        String UPLOAD_DIRECTORY = "C:/uploads";
-        
-        String uploadPath = UPLOAD_DIRECTORY + File.separator + fileName;
+        //String UPLOAD_DIRECTORY = "C:/uploads";
+        String uploadPath = getServletContext().getRealPath("") + File.separator + fileName;
+        //String uploadPath = UPLOAD_DIRECTORY + File.separator + fileName;
         System.out.println("Archivo guardado en: " + uploadPath);
         File file = new File(uploadPath);
         try (InputStream input = filePart.getInputStream()) {
@@ -104,13 +111,21 @@ public class registrarImagen extends HttpServlet {
             error = false;
         }
         database db  = new database();
+        HttpSession session = request.getSession();
+        String user = (String) session.getAttribute("user");
         
-        boolean okImage = db.image_upload(titulo, description,author,fechaCapt,fechaGuard,fileName); 
+        boolean okImage = db.image_upload(titulo, description, keywords, author, user,fechaCapt,fechaGuard,fileName); 
         
         if (!error) {
             if (okImage) {
-                RequestDispatcher rd = request.getRequestDispatcher("/menu.jsp");
-                rd.forward(request, response);
+                PrintWriter out = response.getWriter();
+                out.println("<h1>Se ha registrado la imagen correctamente</h1>");
+                out.println("<script>");
+                out.println("  setTimeout(function() {");
+                out.println("    window.location.href = '" + request.getContextPath() + "/menu.jsp';");
+                out.println("  }, 2000);"); 
+                out.println("</script>");
+                out.close();
             } else {
                 request.setAttribute("TError", "image_error");
                 RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");

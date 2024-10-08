@@ -12,6 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import DB.database;
 
 /**
@@ -81,6 +82,9 @@ public class login extends HttpServlet {
         String passwords = request.getParameter("Password");
         
         boolean auth = db.login(username,passwords);
+        
+        HttpSession session = request.getSession();
+        session.setAttribute("user",username);
         
         if (auth) {
             RequestDispatcher rd = request.getRequestDispatcher("/menu.jsp");
