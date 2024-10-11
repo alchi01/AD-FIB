@@ -73,10 +73,7 @@ public class menu extends HttpServlet {
         else if (request.getParameter("elimImagen") != null)
             destino = "eliminarImagen.jsp";
         
-        RequestDispatcher dispatcher = request.getRequestDispatcher(destino);
-       
-        dispatcher.forward(request, response);
-        
+        response.sendRedirect(destino);
     }
     
 }
