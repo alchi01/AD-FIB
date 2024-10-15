@@ -18,6 +18,7 @@ import jakarta.servlet.http.Part;
 import DB.database;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 
 
 /**
@@ -65,17 +66,26 @@ public class buscarImagen extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        System.out.println("Entrando al servlet BuscarImagen");
         String buscar = request.getParameter("Busqueda");
         database db  = new database();
         HttpSession session = request.getSession();
         String user = (String) session.getAttribute("user");
-        boolean show_success = db.show_images();
-        PrintWriter out = response.getWriter();
-        out.println(show_success);
-        if (show_success == false){
-             request.setAttribute("message", "No hay Imagenes");
-             request.getRequestDispatcher("buscarImagen.jsp").forward(request, response);
-        }
+        ArrayList<Object[]> listaImagenes = db.show_images();
+        ArrayList<Object[]> imagenesFiltradas = new ArrayList<>();
+        System.out.println(user);
+        for (Object[] filaImagen : listaImagenes) {
+            String usuarioImagen = (String) filaImagen[5];  // El usuario está en la posición 5 del array
+            System.out.println(usuarioImagen);
+            if (usuarioImagen.equals(user)) {
+                imagenesFiltradas.add(filaImagen);
+                System.out.println("ID: " + filaImagen[0]);
+           }
+       }
+        System.out.println("Saliendo");
+        // Pasar las imágenes filtradas al JSP
+        request.setAttribute("imagenesFiltradas", imagenesFiltradas);
+        request.getRequestDispatcher("buscarImagen.jsp").forward(request, response);
     }
 
     /**
@@ -89,7 +99,14 @@ public class buscarImagen extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String destino = "";
+        if (request.getParameter("modImagen") != null)
+            destino = "modificarImagen.jsp";
+       else if (request.getParameter("elimImagen") != null)
+            destino = "eliminarImagen.jsp";
+        
+        response.sendRedirect(destino);
+            
     }
 
     /**
