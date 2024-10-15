@@ -13,5 +13,14 @@
     </head>
     <body>
         <h1>Buscar Imagen!</h1>
+        <form action = "registrarImagen" method = "GET">
+            <p align="center">
+            <label for="buscar">Buscar: </label>
+            <input type ="text" name ="Busqueda">
+            <br><br>
+            ${message}
+            </p>
+            
+        </form>
     </body>
 </html>

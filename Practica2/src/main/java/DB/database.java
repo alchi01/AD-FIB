@@ -118,4 +118,37 @@ public class database {
         }
         return okImage;
     }
+    public boolean show_images(){
+        boolean show_success = false;
+        
+        Connection connection = null;
+        //response.setContentType("text/html;charset=UTF-8");
+         try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+            connection.setAutoCommit(false); // Set auto-commit to false
+            String sql =  "SELECT * FROM IMAGE";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            show_success = true;
+            statement.executeUpdate();
+            connection.commit(); // Commit the transaction
+         }
+          catch (ClassNotFoundException e) {
+            System.out.println("ClassNotFoundException: " + e.getMessage());
+        }
+        catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        }finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                // connection close failed.
+                System.err.println(e.getMessage());
+           }
+        }
+         
+        return show_success;
+    }
 }

@@ -13,5 +13,9 @@
     </head>
     <body>
         <h1>Eliminar Imagen!</h1>
+        <form action = "eliminarImagen" method = "POST">
+            <input type="text" name="Titulo">
+            <input type="submit" value="Eliminar">
+        </form>
     </body>
 </html>
