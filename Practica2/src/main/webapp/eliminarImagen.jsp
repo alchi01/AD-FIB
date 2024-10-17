@@ -4,7 +4,15 @@
     Author     : alumne
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<% 
+    HttpSession usersession = request.getSession(false);
+    String user = (String) usersession.getAttribute("user");
+    if (user == null) response.sendRedirect("login.jsp");
+            
+%>
 <!DOCTYPE html>
 <html>
     <head>
