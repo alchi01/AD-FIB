@@ -77,13 +77,16 @@ public class eliminarImagen extends HttpServlet {
         
         if (elim){
             PrintWriter out = response.getWriter();
-                out.println("<h1>Se ha eliminado la imagen correctamente</h1>");
-                out.println("<script>");
-                out.println("  setTimeout(function() {");
-                out.println("    window.location.href = '" + request.getContextPath() + "/buscarImagen';");
-                out.println("  }, 2000);"); 
-                out.println("</script>");
-                out.close();  
+            out.println("<html>");
+            out.println("<head></head>");
+            out.println("<body>");
+            out.println("<h1>Se ha eliminado la imagen correctamente</h1>");
+            out.println("<form action='menu.jsp' method='get'>");
+            out.println("<input type='submit' value='Volver al menú'>");
+            out.println("</form>");
+            out.println("</body>");
+            out.println("</html>");
+            out.close();  
         }
         else {
             request.setAttribute("TError", "image_error");

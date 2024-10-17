@@ -7,20 +7,19 @@ package servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.RequestDispatcher;
 import DB.database;
-
 /**
  *
  * @author alumne
  */
-@WebServlet(name = "login", urlPatterns = {"/login"})
-public class login extends HttpServlet {
+@WebServlet(name = "modificarImagen", urlPatterns = {"/modificarImagen"})
+public class modificarImagen extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,19 +32,19 @@ public class login extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            response.setContentType("text/html;charset=UTF-8");
-            try (PrintWriter out = response.getWriter()) {
-                /* TODO output your page here. You may use following sample code. */
-                out.println("<!DOCTYPE html>");
-                out.println("<html>");
-                out.println("<head>");
-                out.println("<title>Servlet login</title>");            
-                out.println("</head>");
-                out.println("<body>");
-                out.println("<h1>Servlet login at " + request.getContextPath() + "</h1>");
-                out.println("</body>");
-                out.println("</html>");
-            }
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet modificarImagen</title>");            
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet modificarImagen at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -74,27 +73,44 @@ public class login extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String titulo = request.getParameter("newTit");
+                 if (titulo == null) {
+        System.out.println("El parámetro newTit no se está enviando correctamente");
+    } else {
+        System.out.println("El parámetro newTit se está enviando correctamente: " + titulo);
+    }
+        String descripcion = request.getParameter("newDesc");
+        String keywords = request.getParameter("newKey");
+        String imagen = request.getParameter("newImg");
+        database db = new database();
         
         
-        database db  = new database();
- 
-        String username = request.getParameter("User");
-        String passwords = request.getParameter("Password");
-        
-        boolean auth = db.login(username,passwords);
-        
-        
-        if (auth) {
-            HttpSession session = request.getSession();
-            session.setAttribute("user",username);
-            response.sendRedirect("menu.jsp");
+        /*HttpSession session = request.getSession();
+        int id = (int) session.getAttribute("id");*/
+        // Procesar los valores obtenidos
+        boolean okMod  = db.image_modify(titulo, descripcion, keywords, imagen, 1);
+        if ((titulo != null && titulo.trim().isEmpty()) || (descripcion != null && descripcion.trim().isEmpty()) || (keywords != null && keywords.trim().isEmpty()) || (imagen != null && imagen.trim().isEmpty())) {
+            okMod = false;
         } 
-        else {
-            request.setAttribute("TError", "login_error");
+        
+        if (okMod) { 
+        response.setContentType("text/html");
+
+        PrintWriter out = response.getWriter();
+        out.println("<html>");
+        out.println("<head></head>");
+        out.println("<body>");
+        out.println("<h1>Se ha modificado la imagen correctamente</h1>");
+        out.println("<form action='menu.jsp' method='get'>");
+        out.println("<input type='submit' value='Volver al menú'>");
+        out.println("</form>");
+        out.println("</body>");
+        out.println("</html>");
+        } else {
+            request.setAttribute("TError", "image_error");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
         }
-           
     }
 
     /**

@@ -202,4 +202,61 @@ public class database {
         
         return correct_elim;
     }
+      public boolean image_modify(String titulo, String descripcion, String keywords, String imagen, int id) {
+        boolean okMod = false;
+        
+        Connection connection = null;
+        //response.setContentType("text/html;charset=UTF-8");
+        
+        try {
+            int cont = 1;
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+            String sql = "UPDATE IMAGE SET ";
+            if (titulo != null)  sql += "title = ?, ";
+            if (descripcion != null) sql += "description = ?, ";
+            if (keywords != null) sql += "keywords = ?, ";
+            if (imagen != null) sql += "filename = ? ";
+            sql += "WHERE id = ?";
+            System.out.println(sql);
+            PreparedStatement statement = connection.prepareStatement(sql);
+            if (titulo != null) {
+                statement.setString(cont, titulo);
+                ++cont;
+            }
+            if (descripcion != null) {
+                statement.setString(cont, descripcion);
+                ++cont;
+            }
+             if (keywords != null) {
+                 statement.setString(cont, keywords);
+                 ++cont;
+             }
+            if (imagen != null) {
+                statement.setString(cont, imagen);
+                ++cont;
+            }
+            statement.setInt(cont, id);
+            okMod = true;
+            statement.executeUpdate();
+            connection.commit();
+            
+        }
+        catch (ClassNotFoundException e) {
+            System.out.println("ClassNotFoundException: " + e.getMessage());
+        }
+        catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        }finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                // connection close failed.
+                System.err.println(e.getMessage());
+           }
+        }
+        return okMod;
+    }
 }

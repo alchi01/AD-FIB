@@ -47,16 +47,11 @@ public class registrarImagen extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        HttpSession session = request.getSession();
+        String user = (String) session.getAttribute("user");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet registrarImagen</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet registrarImagen at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
+
             out.println("</html>");
         }
     }
@@ -87,9 +82,8 @@ public class registrarImagen extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        boolean error = true;
         String titulo = request.getParameter("Titulo");
-        String description = request.getParameter("Descripcion");
+        String descripcion = request.getParameter("Descripcion");
         String keywords = request.getParameter("Keywords");
         String author = request.getParameter("Autor");
         String fechaCapt = request.getParameter("Fecha de creacion");
@@ -103,35 +97,50 @@ public class registrarImagen extends HttpServlet {
         //String UPLOAD_DIRECTORY = "C:/uploads";
         String uploadPath = getServletContext().getRealPath("") + File.separator + fileName;
         //String uploadPath = UPLOAD_DIRECTORY + File.separator + fileName;
-        System.out.println("Archivo guardado en: " + uploadPath);
+        //System.out.println("Archivo guardado en: " + uploadPath);
         File file = new File(uploadPath);
         try (InputStream input = filePart.getInputStream()) {
             Files.copy(input, file.toPath());
-            System.out.println("Archivo " + fileName + " ha sido subido corectamente");
-            error = false;
+            //System.out.println("Archivo " + fileName + " ha sido subido corectamente");
+        } catch (Exception e) {
+            request.setAttribute("TError", "image_error");
+            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+            rd.forward(request, response);
         }
         database db  = new database();
         HttpSession session = request.getSession();
         String user = (String) session.getAttribute("user");
         
-        boolean okImage = db.image_upload(titulo, description, keywords, author, user,fechaCapt,fechaGuard,fileName); 
+        boolean okImage;
         
-        if (!error) {
-            if (okImage) {
-                PrintWriter out = response.getWriter();
-                out.println("<h1>Se ha registrado la imagen correctamente</h1>");
-                out.println("<script>");
-                out.println("  setTimeout(function() {");
-                out.println("    window.location.href = '" + request.getContextPath() + "/menu.jsp';");
-                out.println("  }, 2000);"); 
-                out.println("</script>");
-                out.close();
-            } else {
-                request.setAttribute("TError", "image_error");
-                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-                rd.forward(request, response);
+        if (titulo == null || descripcion == null || keywords == null || author == null || fechaCapt == null) okImage = false;
+        else {
+            if (titulo.trim().isEmpty() || descripcion.trim().isEmpty() || keywords.trim().isEmpty() || author.trim().isEmpty() || fechaCapt.trim().isEmpty()) {
+                okImage = false;
             }
+            else okImage = db.image_upload(titulo, descripcion, keywords, author, user,fechaCapt,fechaGuard,fileName);
         }
+        
+
+        
+        if (okImage) {
+            try (PrintWriter out = response.getWriter()) {
+                    out.println("<html>");
+                    out.println("<head></head>");
+                    out.println("<h1>Se ha registrado la imagen correctamente</h1>");
+                    out.println("<body>");
+                    out.println("<form action='menu.jsp' method='get'>");
+                    out.println("<input type='submit' value='Volver al menu'>");
+                    out.println("</form>");
+                    out.println("<body>");
+                    out.println("<html>");
+                    out.close();
+                }
+        } else {
+            request.setAttribute("TError", "image_error");
+            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+            rd.forward(request, response);
+            }
     }
 
     /**
