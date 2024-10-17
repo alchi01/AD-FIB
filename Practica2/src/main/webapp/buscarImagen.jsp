@@ -18,9 +18,11 @@
         <form action = "buscarImagen" method = "GET">
             
             <p align="center">
-            <label for="buscar">Buscar: </label>
-            <input type ="text" name ="Busqueda">
-            <br><br>
+                <label for="buscarTitulo">Título:</label>
+                <input type="text" name="buscarTitulo" value="${param.buscarTitulo}">
+                <label for="buscarDescripcion">Descripción:</label>
+                <input type="text" name="buscarDescripcion" value="${param.buscarDescripcion}">
+                <button type="submit">Buscar</button>
             </p>
         </form>
         <c:forEach var="filaImagen" items="${imagenesFiltradas}">

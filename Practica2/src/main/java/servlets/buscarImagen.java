@@ -67,23 +67,36 @@ public class buscarImagen extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         System.out.println("Entrando al servlet BuscarImagen");
-        String buscar = request.getParameter("Busqueda");
-        database db  = new database();
+
+        // Obtener los parámetros del formulario
+        String buscarTitulo = request.getParameter("buscarTitulo");
+        String buscarDescripcion = request.getParameter("buscarDescripcion");
+
+        // Obtener el usuario de la sesión
         HttpSession session = request.getSession();
         String user = (String) session.getAttribute("user");
-        ArrayList<Object[]> listaImagenes = db.show_images();
+
+        // Instancia de la base de datos
+        database db = new database();
+
+        // Obtener las imágenes filtradas usando la nueva función
+        ArrayList<Object[]> listaImagenes = db.show_images(buscarTitulo, buscarDescripcion);
+
+        // Filtrar solo las imágenes del usuario actual
         ArrayList<Object[]> imagenesFiltradas = new ArrayList<>();
         for (Object[] filaImagen : listaImagenes) {
             String usuarioImagen = (String) filaImagen[5];  // El usuario está en la posición 5 del array
             if (usuarioImagen.equals(user)) {
                 imagenesFiltradas.add(filaImagen);
-           }
-       }
+            }
+        }
+
         // Pasar las imágenes filtradas al JSP
         request.setAttribute("imagenesFiltradas", imagenesFiltradas);
+
+        // Redirigir a buscarImagen.jsp para mostrar los resultados
         request.getRequestDispatcher("buscarImagen.jsp").forward(request, response);
     }
-
     /**
      * Handles the HTTP <code>POST</code> method.
      *
