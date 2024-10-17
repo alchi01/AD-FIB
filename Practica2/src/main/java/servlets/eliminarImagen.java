@@ -5,16 +5,11 @@
 package servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
 import DB.database;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpSession;
@@ -61,6 +56,7 @@ public class eliminarImagen extends HttpServlet {
         database db  = new database();
  
         String imagenIdStr = request.getParameter("imagenId");
+        String message;
        
         
         int imagenId = Integer.parseInt(imagenIdStr);
@@ -68,17 +64,10 @@ public class eliminarImagen extends HttpServlet {
         boolean elim = db.eliminate(imagenId);
         
         if (elim){
-            PrintWriter out = response.getWriter();
-            out.println("<html>");
-            out.println("<head></head>");
-            out.println("<body>");
-            out.println("<h1>Se ha eliminado la imagen correctamente</h1>");
-            out.println("<form action='menu.jsp' method='get'>");
-            out.println("<input type='submit' value='Volver al menú'>");
-            out.println("</form>");
-            out.println("</body>");
-            out.println("</html>");
-            out.close();  
+            message = "Se ha eliminado la imagen correctamente";
+            request.setAttribute("message", message);
+            RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
+            rd.forward(request, response);
         }
         else {
             request.setAttribute("TError", "image_error");

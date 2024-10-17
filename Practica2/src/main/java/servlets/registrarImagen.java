@@ -85,6 +85,7 @@ public class registrarImagen extends HttpServlet {
         String fechaCapt = request.getParameter("Fecha de creacion");
         Part filePart= request.getPart("Subir Imagen");
         String fileName = filePart.getSubmittedFileName();
+        String message;
         
         LocalDate fecha = LocalDate.now();
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -120,18 +121,10 @@ public class registrarImagen extends HttpServlet {
 
         
         if (okImage) {
-            try (PrintWriter out = response.getWriter()) {
-                    out.println("<html>");
-                    out.println("<head></head>");
-                    out.println("<h1>Se ha registrado la imagen correctamente</h1>");
-                    out.println("<body>");
-                    out.println("<form action='menu.jsp' method='get'>");
-                    out.println("<input type='submit' value='Volver al menu'>");
-                    out.println("</form>");
-                    out.println("<body>");
-                    out.println("<html>");
-                    out.close();
-                }
+            message = "Se ha subido la imagen correctamente";
+            request.setAttribute("message", message);
+            RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
+            rd.forward(request, response);
         } else {
             request.setAttribute("TError", "image_error");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");

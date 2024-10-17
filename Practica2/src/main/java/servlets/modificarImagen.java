@@ -72,6 +72,7 @@ public class modificarImagen extends HttpServlet {
         String imagen = request.getParameter("newImg");
         String imagenIdStr = request.getParameter("imagenId");
         int imagenId = Integer.parseInt(imagenIdStr);
+        String message;
 
         database db = new database();
         
@@ -95,18 +96,10 @@ public class modificarImagen extends HttpServlet {
         }
         
         if (okMod) { 
-        response.setContentType("text/html");
-
-        PrintWriter out = response.getWriter();
-        out.println("<html>");
-        out.println("<head></head>");
-        out.println("<body>");
-        out.println("<h1>Se ha modificado la imagen correctamente</h1>");
-        out.println("<form action='menu.jsp' method='get'>");
-        out.println("<input type='submit' value='Volver al menú'>");
-        out.println("</form>");
-        out.println("</body>");
-        out.println("</html>");
+            message = "Se ha modificado la imagen correctamente";
+            request.setAttribute("message", message);
+            RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
+            rd.forward(request, response);
         } else {
             request.setAttribute("TError", "image_error");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");

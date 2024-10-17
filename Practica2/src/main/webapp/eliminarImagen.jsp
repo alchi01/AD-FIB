@@ -30,8 +30,9 @@
             <p align ="center"> Esta seguro de eliminar esta imagen? </p>
             <p align="center">Title: <%= imagenTitle %></p>
             <p align="center"><img src="<%= imagenFile %>" width="200" height="200"></p>
-            <input type="hidden" name="imagenId" value="<%= imagenId %>">
+            <input type="hidden" name="imagenId" value="<%= imagenId %>" />
             <p align="center"><input type="submit" value="Eliminar"></p>
         </form>
+        
     </body>
 </html>
