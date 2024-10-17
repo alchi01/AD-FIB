@@ -46,14 +46,10 @@ public class registrarImagen extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        HttpSession session = request.getSession();
-        String user = (String) session.getAttribute("user");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-
-            out.println("</html>");
-        }
+            HttpSession session = request.getSession(false);
+            String user = (String) session.getAttribute("user");
+            if (user == null) response.sendRedirect("login.jsp");
+            else response.sendRedirect("menu.jsp");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

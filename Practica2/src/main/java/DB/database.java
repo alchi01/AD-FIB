@@ -5,6 +5,7 @@
 package DB;
 
 import java.io.IOException;
+import java.util.List;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -119,19 +120,35 @@ public class database {
         }
         return okImage;
     }
-    public ArrayList<Object[]> show_images(){
+    public ArrayList<Object[]> show_images(String title, String description){
         ArrayList<Object[]> listaImagenes = new ArrayList<>();
-        
-         Connection connection = null;
+        Connection connection = null;
 
         try {
             Class.forName("org.apache.derby.jdbc.ClientDriver");
             connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
-            connection.setAutoCommit(false); // Deshabilitar auto-commit
-            String sql = "SELECT * FROM IMAGE";
+
+            String sql = "SELECT * FROM IMAGE WHERE 1=1";
+
+            if (title != null && !title.isEmpty()) {
+                sql += " AND TITLE LIKE ?";
+            }
+            if (description != null && !description.isEmpty()) {
+                sql += " AND DESCRIPTION LIKE ?";
+            }
+
             PreparedStatement statement = connection.prepareStatement(sql);
+            int paramIndex = 1;
+
+            if (title != null && !title.isEmpty()) {
+                statement.setString(paramIndex++, "%" + title + "%");
+            }
+            if (description != null && !description.isEmpty()) {
+                statement.setString(paramIndex++, "%" + description + "%");
+            }
+
             ResultSet resultSet = statement.executeQuery();
-            
+
             while (resultSet.next()) {
                 Object[] filaImagen = new Object[9];
                 filaImagen[0] = resultSet.getInt("ID");
@@ -144,24 +161,25 @@ public class database {
                 filaImagen[7] = resultSet.getString("STORAGE_DATE");
                 filaImagen[8] = resultSet.getString("FILENAME");
 
-                // Añadir la fila al ArrayList
                 listaImagenes.add(filaImagen);
             }
-            connection.commit(); // Commit the transaction
+
         } catch (ClassNotFoundException | SQLException e) {
-        System.out.println("Error: " + e.getMessage());
-    } finally {
-        try {
-            if (connection != null) {
-                connection.close();
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
             }
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
         }
+
+        return listaImagenes;
     }
 
-    return listaImagenes;
-    }
+ 
     
     
     public boolean eliminate(int ID) {
@@ -204,7 +222,6 @@ public class database {
     }
       public boolean image_modify(String titulo, String descripcion, String keywords, String imagen, int id) {
         boolean okMod = false;
-        
         Connection connection = null;
         //response.setContentType("text/html;charset=UTF-8");
         
@@ -212,37 +229,51 @@ public class database {
             int cont = 1;
             Class.forName("org.apache.derby.jdbc.ClientDriver");
             connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
-            String sql = "UPDATE IMAGE SET ";
-            if (titulo != null)  sql += "title = ?, ";
-            if (descripcion != null) sql += "description = ?, ";
-            if (keywords != null) sql += "keywords = ?, ";
-            if (imagen != null) sql += "filename = ? ";
-            sql += "WHERE id = ?";
-            System.out.println(sql);
-            PreparedStatement statement = connection.prepareStatement(sql);
-            if (titulo != null) {
-                statement.setString(cont, titulo);
-                ++cont;
+            StringBuilder sql = new StringBuilder("UPDATE IMAGE SET ");
+            List<String> updates = new ArrayList<>(); // Para almacenar las partes de la consulta
+
+            if (!titulo.isEmpty()) {
+                updates.add("title = ?");
             }
-            if (descripcion != null) {
-                statement.setString(cont, descripcion);
-                ++cont;
+            if (!descripcion.isEmpty()) {
+                updates.add("description = ?");
             }
-             if (keywords != null) {
-                 statement.setString(cont, keywords);
-                 ++cont;
-             }
-            if (imagen != null) {
-                statement.setString(cont, imagen);
-                ++cont;
+            if (!keywords.isEmpty()) {
+                updates.add("keywords = ?");
             }
+            if (!imagen.isEmpty()) {
+                updates.add("filename = ?");
+            }
+
+            sql.append(String.join(", ", updates));
+            sql.append(" WHERE id = ?");
+
+            System.out.println(sql.toString());
+
+            PreparedStatement statement = connection.prepareStatement(sql.toString());
+
+            if (!titulo.isEmpty()) {
+                    statement.setString(cont, titulo);
+                    ++cont;
+                }
+                if (!descripcion.isEmpty()) {
+                    statement.setString(cont, descripcion);
+                    ++cont;
+                }
+                 if (!keywords.isEmpty()) {
+                     statement.setString(cont, keywords);
+                     ++cont;
+                 }
+                if (!imagen.isEmpty()) {
+                    statement.setString(cont, imagen);
+                    ++cont;
+                }
             statement.setInt(cont, id);
             okMod = true;
             statement.executeUpdate();
             connection.commit();
             
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             System.out.println("ClassNotFoundException: " + e.getMessage());
         }
         catch (SQLException e) {
@@ -259,4 +290,35 @@ public class database {
         }
         return okMod;
     }
+      
+     public String consulta_imagen(int id) {
+         Connection connection = null;
+         String filename = null;
+         try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+            String sql = "SELECT filename FROM image WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                filename = resultSet.getString("filename"); // Obtener el valor del campo filename
+            }
+         } catch (ClassNotFoundException e) {
+            System.out.println("ClassNotFoundException: " + e.getMessage());
+        }
+        catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        }finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                // connection close failed.
+                System.err.println(e.getMessage());
+           }
+        }
+         return filename;
+     }
 }

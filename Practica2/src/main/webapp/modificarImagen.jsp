@@ -1,6 +1,6 @@
 <%-- 
     Document   : modificarImagen
-    Created on : 3 oct 2024, 13:08:37
+    Created on : 17 oct 2024, 13:02:02
     Author     : alumne
 --%>
 
@@ -9,23 +9,26 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Modificar imagen</title>
+        <title>Modificar Imagen</title>
     </head>
-    
-        <h1>Modificar Imagen!</h1>
-        
-        <form action = "modificarImagen" method = "POST" enctype= "multipart/form-data">
-            <br><br>
-            <input type="text" name="newTit" id="newTit">
-            <br>
-            <input type="text" name="newDesc" id="newDesc">
-            <br>
-            <input type="text" name="newKey" id="newKey">
-            <br>
-            <input type="text" name="newImg" id="newImg">
-            <br>
-            <button id="enviar">Enviar</button>
-            </form>
-
-    
+    <body>
+        <%
+            String imagenId = request.getParameter("imagenId");
+            String imagenTitle = request.getParameter("imagenTitle");
+            String imagenFile = request.getParameter("imagenFile");
+        %>
+        <h1>Modificar Imagen</h1>
+        <br><!-- comment -->
+                
+        <form action="modificarImagen" method="POST" >
+            <h2> Si algun campo esta en blanco se determinará que no se desea la modificacion </h2>
+            <p align="center"><img src="<%= imagenFile %>" width="200" height="200"></p>
+            <p align="center"><label for="titulo">Nuevo Título:</label><input type="text" name="newTit"></p>
+            <p align="center"><label for="titulo">Nueva Descripcion:</label><input type="text" name="newDesc"></p>
+            <p align="center"><label for="titulo">Nuevas Keywords:</label><input type="text" name="newKey"></p>
+            <p align="center"><label for="titulo">Nuevo nombre de la imagen</label><input type="text" name="newImg"></p>
+            <p align="center"><input type="submit" value="Modificar"></p>
+            <input type="hidden" name="imagenId" value="<%= imagenId %>">
+        </form>
+    </body>
 </html>

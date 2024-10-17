@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.RequestDispatcher;
 import DB.database;
+import java.io.File;
 /**
  *
  * @author alumne
@@ -32,19 +33,11 @@ public class modificarImagen extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet modificarImagen</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet modificarImagen at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+            HttpSession session = request.getSession(false);
+            String user = (String) session.getAttribute("user");
+            if (user == null) response.sendRedirect("login.jsp");
+            else response.sendRedirect("menu.jsp");
+            
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -74,24 +67,32 @@ public class modificarImagen extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String titulo = request.getParameter("newTit");
-                 if (titulo == null) {
-        System.out.println("El parámetro newTit no se está enviando correctamente");
-    } else {
-        System.out.println("El parámetro newTit se está enviando correctamente: " + titulo);
-    }
         String descripcion = request.getParameter("newDesc");
         String keywords = request.getParameter("newKey");
         String imagen = request.getParameter("newImg");
+        String imagenIdStr = request.getParameter("imagenId");
+        int imagenId = Integer.parseInt(imagenIdStr);
+
         database db = new database();
         
         
         /*HttpSession session = request.getSession();
         int id = (int) session.getAttribute("id");*/
         // Procesar los valores obtenidos
-        boolean okMod  = db.image_modify(titulo, descripcion, keywords, imagen, 1);
-        if ((titulo != null && titulo.trim().isEmpty()) || (descripcion != null && descripcion.trim().isEmpty()) || (keywords != null && keywords.trim().isEmpty()) || (imagen != null && imagen.trim().isEmpty())) {
-            okMod = false;
-        } 
+        boolean okMod  = db.image_modify(titulo, descripcion, keywords, imagen, imagenId);
+        
+        
+        if (okMod && !imagen.isEmpty()) {
+            String imagenAnt = db.consulta_imagen(imagenId);
+            String oldPath = getServletContext().getRealPath("") + File.separator + imagenAnt;
+            String newPath = getServletContext().getRealPath("") + File.separator + imagen;
+            File file = new File(oldPath);
+            File newfile = new File(newPath);
+            try { file.renameTo(newfile);}
+            catch (Exception e) {
+                okMod = false;
+            }
+        }
         
         if (okMod) { 
         response.setContentType("text/html");
