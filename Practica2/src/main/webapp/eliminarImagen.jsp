@@ -13,9 +13,17 @@
     </head>
     <body>
         <h1>Eliminar Imagen!</h1>
+        <%
+            String imagenId = request.getParameter("imagenId");
+            String imagenTitle = request.getParameter("imagenTitle");
+            String imagenFile = request.getParameter("imagenFile");
+        %>
         <form action = "eliminarImagen" method = "POST">
-            <input type="text" name="Titulo">
-            <input type="submit" value="Eliminar">
+            <p align ="center"> Esta seguro de eliminar esta imagen? </p>
+            <p align="center">Title: <%= imagenTitle %></p>
+            <p align="center"><img src="<%= imagenFile %>" width="200" height="200"></p>
+            <input type="hidden" name="imagenId" value="<%= imagenId %>">
+            <p align="center"><input type="submit" value="Eliminar"></p>
         </form>
     </body>
 </html>

@@ -73,16 +73,12 @@ public class buscarImagen extends HttpServlet {
         String user = (String) session.getAttribute("user");
         ArrayList<Object[]> listaImagenes = db.show_images();
         ArrayList<Object[]> imagenesFiltradas = new ArrayList<>();
-        System.out.println(user);
         for (Object[] filaImagen : listaImagenes) {
             String usuarioImagen = (String) filaImagen[5];  // El usuario está en la posición 5 del array
-            System.out.println(usuarioImagen);
             if (usuarioImagen.equals(user)) {
                 imagenesFiltradas.add(filaImagen);
-                System.out.println("ID: " + filaImagen[0]);
            }
        }
-        System.out.println("Saliendo");
         // Pasar las imágenes filtradas al JSP
         request.setAttribute("imagenesFiltradas", imagenesFiltradas);
         request.getRequestDispatcher("buscarImagen.jsp").forward(request, response);
@@ -99,13 +95,7 @@ public class buscarImagen extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String destino = "";
-        if (request.getParameter("modImagen") != null)
-            destino = "modificarImagen.jsp";
-       else if (request.getParameter("elimImagen") != null)
-            destino = "eliminarImagen.jsp";
-        
-        response.sendRedirect(destino);
+        processRequest(request, response);
             
     }
 

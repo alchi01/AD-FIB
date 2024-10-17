@@ -162,4 +162,44 @@ public class database {
 
     return listaImagenes;
     }
+    
+    
+    public boolean eliminate(int ID) {
+        Connection connection = null;
+        //response.setContentType("text/html;charset=UTF-8");
+        
+        boolean correct_elim = false; 
+        
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+
+        // create a database connection
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+            String sql = "DELETE FROM IMAGE WHERE ID = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            // Asignar el valor de ID en la consulta
+            statement.setInt(1, ID);
+            int rowsAffected = statement.executeUpdate();
+
+            correct_elim = (rowsAffected > 0); // Si al menos una fila fue afectada, la eliminación fue correcta
+        }
+        catch (ClassNotFoundException e) {
+            System.out.println("ClassNotFoundException: " + e.getMessage());
+        }
+        catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        }finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                // connection close failed.
+                System.err.println(e.getMessage());
+           }
+        }
+        
+        return correct_elim;
+    }
 }

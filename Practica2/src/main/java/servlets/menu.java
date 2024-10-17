@@ -66,12 +66,8 @@ public class menu extends HttpServlet {
         
         if (request.getParameter("regImagen") != null)
             destino = "registrarImagen.jsp";
-        else if (request.getParameter("modImagen") != null)
-            destino = "modificarImagen.jsp";
         else if (request.getParameter("busImagen") != null)
             destino = "buscarImagen";
-        else if (request.getParameter("elimImagen") != null)
-            destino = "eliminarImagen.jsp";
         
         response.sendRedirect(destino);
     }

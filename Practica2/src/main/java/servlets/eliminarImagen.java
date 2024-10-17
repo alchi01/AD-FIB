@@ -66,7 +66,31 @@ public class eliminarImagen extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        database db  = new database();
+ 
+        String imagenIdStr = request.getParameter("imagenId");
+       
         
+        int imagenId = Integer.parseInt(imagenIdStr);
+        
+        boolean elim = db.eliminate(imagenId);
+        
+        if (elim){
+            PrintWriter out = response.getWriter();
+                out.println("<h1>Se ha eliminado la imagen correctamente</h1>");
+                out.println("<script>");
+                out.println("  setTimeout(function() {");
+                out.println("    window.location.href = '" + request.getContextPath() + "/buscarImagen';");
+                out.println("  }, 2000);"); 
+                out.println("</script>");
+                out.close();  
+        }
+        else {
+            request.setAttribute("TError", "image_error");
+            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+            rd.forward(request, response);
+        }
+               
     }
     
 }

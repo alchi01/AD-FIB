@@ -14,26 +14,42 @@
     </head>
     <body>
         <h2>Imágenes del Usuario</h2>
+         <p align="left"> <button onclick="location.href='menu.jsp'"> Menu </button>
         <form action = "buscarImagen" method = "GET">
+            
             <p align="center">
             <label for="buscar">Buscar: </label>
             <input type ="text" name ="Busqueda">
             <br><br>
             </p>
-            <c:forEach var="filaImagen" items="${imagenesFiltradas}">
-                <div>
-                    <p align="center">Title: "${filaImagen[1]}"</p>
-                    <p align="center"><img src="/home/alumne/AD-FIB/Practica2/target/Practica2-1.0/${filaImagen[8]}" width="200" height="200"></p>
-                    <p align="center">Description: ${filaImagen[2]}</p>
-                    <p align="center">
-                        <button type="submit" name="modImagen">Modificar imagen</button>
-                        <button type="submit" name="elimImagen" >Eliminar imagen</button>
-                    </p>
-                    
-                </div>
-                <hr>
-            </c:forEach>
-            
         </form>
+        <c:forEach var="filaImagen" items="${imagenesFiltradas}">
+            <div>
+                <p align="center">Title: "${filaImagen[1]}"</p>
+                <p align="center"><img src="${filaImagen[8]}" width="200" height="200"></p>
+                <p align="center">Description: ${filaImagen[2]}</p>
+                <div align="center">
+                    
+                    <form action="modificarImagen.jsp" method="GET">
+                        <input type="hidden" name="imagenId" value="${filaImagen[0]}" /> 
+                        <input type="hidden" name="imagenTitle" value="${filaImagen[1]}" /> 
+                        <input type="hidden" name="imagenFile" value="${filaImagen[8]}" />
+                        <button type="submit">Modificar imagen</button>
+                    </form>
+
+                    
+                    <form action="eliminarImagen.jsp" method="GET">
+                        <input type="hidden" name="imagenId" value="${filaImagen[0]}" /> <!-- ID de la imagen -->
+                        <input type="hidden" name="imagenTitle" value="${filaImagen[1]}" /> <!-- TITLE de la imagen -->
+                        <input type="hidden" name="imagenFile" value="${filaImagen[8]}" /> <!-- FILE de la imagen -->
+                        <button type="submit">Eliminar imagen</button>
+                    </form>
+                </div>
+                
+
+
+            </div>
+            <hr>
+        </c:forEach>
     </body>
 </html>
