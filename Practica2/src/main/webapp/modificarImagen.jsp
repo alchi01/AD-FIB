@@ -38,5 +38,6 @@
             <p align="center"><input type="submit" value="Modificar"></p>
             <input type="hidden" name="imagenId" value="<%= imagenId %>">
         </form>
+        <p align="center"><button onclick="location.href='buscarImagen'"> Volver </button></p>
     </body>
 </html>

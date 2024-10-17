@@ -33,6 +33,7 @@
             <input type="hidden" name="imagenId" value="<%= imagenId %>" />
             <p align="center"><input type="submit" value="Eliminar"></p>
         </form>
+            <p align="center"><button onclick="location.href='buscarImagen'"> Volver </button></p>
         
     </body>
 </html>

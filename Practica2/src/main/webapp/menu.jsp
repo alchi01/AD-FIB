@@ -24,7 +24,7 @@
         <form action="menu" method="post">
             <button type="submit" name="regImagen">Registrar imagen</button>
             <button type="submit" name="busImagen">Buscar imagen</button>
-            
+            <button type="submit" name="CerrSesion">Cerrar Sesion</button>
         </form>
     </body>
 </html>

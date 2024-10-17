@@ -42,5 +42,6 @@
             <br><br>
             <input type="submit" value="Subir la imagen">
         </form>
+        <button onclick="location.href='menu.jsp'"> Volver </button>
     </body>
 </html>

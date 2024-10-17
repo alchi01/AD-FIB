@@ -60,6 +60,11 @@ public class menu extends HttpServlet {
             destino = "registrarImagen.jsp";
         else if (request.getParameter("busImagen") != null)
             destino = "buscarImagen";
+        else if (request.getParameter("CerrSesion") != null){
+            HttpSession session = request.getSession(false);
+            session.invalidate();
+            destino = "login.jsp";
+        }
         
         response.sendRedirect(destino);
     }
