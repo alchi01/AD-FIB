@@ -1,0 +1,9 @@
+servlets/buscarImagen.class
+test/practica2/resources/JakartaEE91Resource.class
+DB/database.class
+servlets/login.class
+servlets/modificarImagen.class
+test/practica2/JakartaRestConfiguration.class
+servlets/menu.class
+servlets/eliminarImagen.class
+servlets/registrarImagen.class
