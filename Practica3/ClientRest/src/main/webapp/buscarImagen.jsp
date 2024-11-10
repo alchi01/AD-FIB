@@ -19,6 +19,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/buscarImagen.css">
     </head>
     <body>
         <h2>Imágenes del Usuario</h2>

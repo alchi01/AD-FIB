@@ -5,11 +5,13 @@
 package servlets;
 
 import java.io.IOException;
-import java.io.File;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.ServletException;
@@ -19,8 +21,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import jakarta.servlet.http.HttpSession;
-import java.nio.file.Files;
-import DB.database;
 
 /**
  *
@@ -30,51 +30,26 @@ import DB.database;
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
                  maxFileSize = 1024 * 1024 * 10,      // 10MB
                  maxRequestSize = 1024 * 1024 * 50)   // 50MB
-
 @WebServlet(name = "registrarImagen", urlPatterns = {"/registrarImagen"})
 public class registrarImagen extends HttpServlet {
 
- 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            HttpSession session = request.getSession(false);
-            String user = (String) session.getAttribute("user");
-            if (user == null) response.sendRedirect("login.jsp");
-            else response.sendRedirect("menu.jsp");
+        HttpSession session = request.getSession(false);
+        String user = (String) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login.jsp");
+        } else {
+            response.sendRedirect("menu.jsp");
+        }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -83,63 +58,84 @@ public class registrarImagen extends HttpServlet {
         String keywords = request.getParameter("Keywords");
         String author = request.getParameter("Autor");
         String fechaCapt = request.getParameter("Fecha de creacion");
-        Part filePart= request.getPart("Subir Imagen");
-        String fileName = filePart.getSubmittedFileName();
-        String message;
-        
-        LocalDate fecha = LocalDate.now();
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        String fechaGuard = fecha.format(format);
-        
-        //String UPLOAD_DIRECTORY = "C:/uploads";
-        String uploadPath = getServletContext().getRealPath("") + File.separator + fileName;
-        //String uploadPath = UPLOAD_DIRECTORY + File.separator + fileName;
-        //System.out.println("Archivo guardado en: " + uploadPath);
-        File file = new File(uploadPath);
-        try (InputStream input = filePart.getInputStream()) {
-            Files.copy(input, file.toPath());
-            //System.out.println("Archivo " + fileName + " ha sido subido corectamente");
-        } catch (Exception e) {
-            request.setAttribute("TError", "image_error");
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.forward(request, response);
-        }
-        database db  = new database();
+        Part filePart = request.getPart("Subir Imagen");
         HttpSession session = request.getSession();
         String user = (String) session.getAttribute("user");
-        
-        boolean okImage;
-        
-        if (titulo == null || descripcion == null || keywords == null || author == null || fechaCapt == null) okImage = false;
-        else {
-            if (titulo.trim().isEmpty() || descripcion.trim().isEmpty() || keywords.trim().isEmpty() || author.trim().isEmpty() || fechaCapt.trim().isEmpty()) {
-                okImage = false;
-            }
-            else okImage = db.image_upload(titulo, descripcion, keywords, author, user,fechaCapt,fechaGuard,fileName);
-        }
-        
+        String fileName = filePart.getSubmittedFileName();
 
-        
-        if (okImage) {
-            message = "Se ha subido la imagen correctamente";
-            request.setAttribute("message", message);
-            RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
-            rd.forward(request, response);
-        } else {
-            request.setAttribute("TError", "image_error");
+        // Validar que los campos requeridos no estén vacíos
+        if (titulo == null || descripcion == null || keywords == null || author == null || fechaCapt == null ||
+            titulo.trim().isEmpty() || descripcion.trim().isEmpty() || keywords.trim().isEmpty() || 
+            author.trim().isEmpty() || fechaCapt.trim().isEmpty()) {
+            request.setAttribute("TError", "Todos los campos son obligatorios.");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
+            return;
+        }
+
+        // Preparar la solicitud al servidor REST
+        String urlString = "http://localhost:8080/RestAD/resources/jakartaee9/uploadImage"; // Cambia esto a la URL correcta
+        HttpURLConnection connection = null;
+
+        try {
+            URL url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // Crear el cuerpo de la solicitud en formato JSON
+            JsonObject jsonInput = Json.createObjectBuilder()
+                    .add("title", titulo)
+                    .add("description", descripcion)
+                    .add("keywords", keywords)
+                    .add("author", author)
+                    .add("fechaCapt", fechaCapt)
+                    .add("user", user)
+                    .build();
+
+            // Enviar los datos JSON
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonInput.toString().getBytes("utf-8");
+                os.write(input, 0, input.length);
             }
+
+            // Enviar el archivo de imagen
+            try (InputStream input = filePart.getInputStream()) {
+                // Enviar el archivo como parte de la solicitud
+                OutputStream os = connection.getOutputStream();
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = input.read(buffer)) != -1) {
+                    os.write(buffer, 0, bytesRead);
+                }
+                os.flush();
+            }
+
+            // Leer la respuesta del servidor
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                request.setAttribute("message", "Se ha subido la imagen correctamente.");
+                RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
+                rd.forward(request, response);
+            } else {
+                request.setAttribute("TError", "Error al subir la imagen. Código de respuesta: " + responseCode);
+                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+                rd.forward(request, response);
+            }
+        } catch (Exception e) {
+            request.setAttribute("TError", "Error al procesar la solicitud: " + e.getMessage());
+            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+            rd.forward(request, response);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
-
+    }
 }

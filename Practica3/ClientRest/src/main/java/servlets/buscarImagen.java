@@ -5,21 +5,23 @@
 package servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
-import DB.database;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
-
 
 /**
  *
@@ -57,35 +59,81 @@ public class buscarImagen extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("Entrando al servlet BuscarImagen");
 
-        // Obtener los parámetros del formulario
+        // Comprobación de la sesión del usuario
+        HttpSession session = request.getSession(false);
+        String user = (String) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        // Obtener los parámetros de búsqueda
         String buscarTitulo = request.getParameter("buscarTitulo");
         String buscarDescripcion = request.getParameter("buscarDescripcion");
 
-        // Obtener el usuario de la sesión
-        HttpSession session = request.getSession();
-        String user = (String) session.getAttribute("user");
+        // Validación de los parámetros de búsqueda
+        if (buscarTitulo == null && buscarDescripcion == null) {
+            response.sendRedirect("menu.jsp");
+            return;
+        }
 
-        // Instancia de la base de datos
-        database db = new database();
+        List<Object[]> listaImagenes = new ArrayList<>();
+        HttpURLConnection connection = null;
 
-        // Obtener las imágenes filtradas usando la nueva función
-        ArrayList<Object[]> listaImagenes = db.show_images(buscarTitulo, buscarDescripcion);
+        try {
+            // Construcción de la URL para la búsqueda en el servidor remoto
+            String searchUrl = "http://localhost:8080/RestAD/resources/jakartaee9/searchImages"
+                    + "?title=" + buscarTitulo + "&description=" + buscarDescripcion;
 
-        // Filtrar solo las imágenes del usuario actual
-        ArrayList<Object[]> imagenesFiltradas = new ArrayList<>();
-        for (Object[] filaImagen : listaImagenes) {
-            String usuarioImagen = (String) filaImagen[5];  // El usuario está en la posición 5 del array
-            if (usuarioImagen.equals(user)) {
-                imagenesFiltradas.add(filaImagen);
+            URL url = new URL(searchUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+
+                // Procesamiento de la respuesta JSON del servidor
+                try (JsonReader jsonReader = Json.createReader(new InputStreamReader(connection.getInputStream()))) {
+                    JsonArray jsonArray = jsonReader.readArray();
+
+                    // Iteración de cada objeto JSON y almacenamiento en la lista de imágenes
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        JsonObject jsonImage = jsonArray.getJsonObject(i);
+                        String title = jsonImage.getString("title");
+                        String description = jsonImage.getString("description");
+                        String urlImage = jsonImage.getString("urlImage");
+                        String author = jsonImage.getString("author");
+                        String creationDate = jsonImage.getString("creationDate");
+
+                        // Solo añadir las imágenes del usuario actual
+                        if (jsonImage.getString("user").equals(user)) {
+                            listaImagenes.add(new Object[]{title, description, urlImage, author, creationDate});
+                        }
+                    }
+                }
+            } else {
+                // Error de conexión, redirigir a una página de error
+                request.setAttribute("tipus_error", "connexio");
+                RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+                rd.forward(request, response);
+                return;
+            }
+        } catch (Exception e) {
+            // Error en la conexión HTTP o en el procesamiento de JSON
+            request.setAttribute("tipus_error", "connexio");
+            RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+            rd.forward(request, response);
+            return;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
             }
         }
 
-        // Pasar las imágenes filtradas al JSP
-        request.setAttribute("imagenesFiltradas", imagenesFiltradas);
-
-        // Redirigir a buscarImagen.jsp para mostrar los resultados
+        // Almacenar los resultados de búsqueda en el request y reenviar a buscarImagen.jsp
+        request.setAttribute("imagenesFiltradas", listaImagenes);
         request.getRequestDispatcher("buscarImagen.jsp").forward(request, response);
     }
     /**

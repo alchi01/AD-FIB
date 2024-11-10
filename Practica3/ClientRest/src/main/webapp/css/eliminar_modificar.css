@@ -1,0 +1,24 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 10 nov 2024, 20:30:40
+    Author     : alumne
+*/
+
+#eliminar-container, #modificar-container {
+    max-width: 500px;
+    margin: 30px auto;
+    text-align: center;
+}
+
+#eliminar-container h1, #modificar-container h1 {
+    font-size: 24px;
+    color: #e74c3c;
+}
+
+#eliminar-container input[type="submit"], #modificar-container input[type="submit"] {
+    width: 80%;
+    margin: 10px auto;
+}

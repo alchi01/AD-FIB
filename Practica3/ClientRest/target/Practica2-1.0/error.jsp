@@ -10,6 +10,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>ERROR</title>
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/error.css">
     </head>
     <body>
         <% String TError = (String) request.getAttribute("TError");%> 

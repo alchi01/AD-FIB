@@ -18,6 +18,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Register</title>
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/registrarImagen.css">
     </head>
     <body>
         <h1>Registrar Imagen</h1>
