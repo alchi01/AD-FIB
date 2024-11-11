@@ -79,9 +79,8 @@ public class login extends HttpServlet {
      @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("User ");
+        String username = request.getParameter("User");
         String password = request.getParameter("Password");
-
         // Validación de entrada
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             request.setAttribute("TError", "login_error");
@@ -91,14 +90,16 @@ public class login extends HttpServlet {
         }
 
         // Construcción de la URL para la autenticación en el servidor remoto
-        String apiUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/login";
-        HttpURLConnection connection = null;
+        
 
         try {
+            String apiUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/login";
             URL url = new URL(apiUrl);
-            connection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             
+            connection.setDoOutput(true);
+            System.out.println("Estoy aqui 1");
             String postData = "username=" + username + "&password=" + password;
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = postData.getBytes("utf-8");
@@ -106,42 +107,25 @@ public class login extends HttpServlet {
             }
 
             // Comprobar el código de respuesta
+            System.out.println("Estoy aqui 2");
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Procesar la respuesta JSON del servidor
-                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                    String inputLine;
-                    StringBuilder responseString = new StringBuilder();
-                    while ((inputLine = in.readLine()) != null) {
-                        responseString.append(inputLine);
-                    }
-
-                    JsonObject jsonResponse = Json.createReader(new InputStreamReader(connection.getInputStream())).readObject();
-                    boolean auth = jsonResponse.getBoolean("authenticated", false);
-
-                    if (auth) {
-                        HttpSession session = request.getSession();
-                        session.setAttribute("user", username);
-                        response.sendRedirect("menu.jsp");
-                    } else {
-                        request.setAttribute("TError", "Credenciales incorrectas. Intente de nuevo.");
-                        RequestDispatcher rd = request.getRequestDispatcher("/login.jsp");
-                        rd.forward(request, response);
-                    }
-                }
+                HttpSession session = request.getSession();
+                System.out.println("Estoy aqui 3");
+                session.setAttribute("user", username);
+                response.sendRedirect("menu.jsp");
             } else {
-                request.setAttribute("TError", "Error en la autenticación del servidor. Código de respuesta: " + responseCode);
-                RequestDispatcher rd = request.getRequestDispatcher("/login.jsp");
+                System.out.println("Estoy aqui 4");
+                request.setAttribute("TError", "login_error");
+                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
                 rd.forward(request, response);
             }
+            connection.disconnect();
         } catch (Exception e) {
+            System.out.println("Estoy aqui 5");
             request.setAttribute("TError", "login_error");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
         }
     }
 
