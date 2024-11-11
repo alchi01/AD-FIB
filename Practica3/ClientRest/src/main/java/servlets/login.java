@@ -84,8 +84,8 @@ public class login extends HttpServlet {
 
         // Validación de entrada
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-            request.setAttribute("TError", "Por favor, ingrese su nombre de usuario y contraseña.");
-            RequestDispatcher rd = request.getRequestDispatcher("/login.jsp");
+            request.setAttribute("TError", "login_error");
+            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
             return;
         }
@@ -135,8 +135,8 @@ public class login extends HttpServlet {
                 rd.forward(request, response);
             }
         } catch (Exception e) {
-            request.setAttribute("TError", "Error en la conexión: " + e.getMessage());
-            RequestDispatcher rd = request.getRequestDispatcher("/login.jsp");
+            request.setAttribute("TError", "login_error");
+            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
         } finally {
             if (connection != null) {
