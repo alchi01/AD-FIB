@@ -220,7 +220,7 @@ public class database {
         
         return correct_elim;
     }
-      public boolean image_modify(String titulo, String descripcion, String keywords, String imagen, int id) {
+      public boolean image_modify(String titulo, String descripcion, String keywords, String autor, int id) {
         boolean okMod = false;
         Connection connection = null;
         //response.setContentType("text/html;charset=UTF-8");
@@ -232,17 +232,17 @@ public class database {
             StringBuilder sql = new StringBuilder("UPDATE IMAGE SET ");
             List<String> updates = new ArrayList<>(); // Para almacenar las partes de la consulta
 
-            if (!titulo.isEmpty()) {
+            if (!titulo.trim().isEmpty()) {
                 updates.add("title = ?");
             }
-            if (!descripcion.isEmpty()) {
+            if (!descripcion.trim().isEmpty()) {
                 updates.add("description = ?");
             }
-            if (!keywords.isEmpty()) {
+            if (!keywords.trim().isEmpty()) {
                 updates.add("keywords = ?");
             }
-            if (!imagen.isEmpty()) {
-                updates.add("filename = ?");
+            if (!autor.trim().isEmpty()) {
+                updates.add("author = ?");
             }
 
             sql.append(String.join(", ", updates));
@@ -252,20 +252,20 @@ public class database {
 
             PreparedStatement statement = connection.prepareStatement(sql.toString());
 
-            if (!titulo.isEmpty()) {
+            if (!titulo.trim().isEmpty()) {
                     statement.setString(cont, titulo);
                     ++cont;
                 }
-                if (!descripcion.isEmpty()) {
+                if (!descripcion.trim().isEmpty()) {
                     statement.setString(cont, descripcion);
                     ++cont;
                 }
-                 if (!keywords.isEmpty()) {
+                 if (!keywords.trim().isEmpty()) {
                      statement.setString(cont, keywords);
                      ++cont;
                  }
-                if (!imagen.isEmpty()) {
-                    statement.setString(cont, imagen);
+                if (!autor.trim().isEmpty()) {
+                    statement.setString(cont, autor);
                     ++cont;
                 }
             statement.setInt(cont, id);

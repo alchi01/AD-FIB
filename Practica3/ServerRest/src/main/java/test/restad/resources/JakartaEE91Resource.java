@@ -80,12 +80,20 @@ public class JakartaEE91Resource {
                                 @FormParam("capture") String capt_date) {
      
      database db = new database();
+     boolean okRegister = true;
      
-     LocalDate fecha = LocalDate.now();
+     LocalDate fechaActual = LocalDate.now();
      DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-     String save_date = fecha.format(format);
+     String save_date = fechaActual.format(format);
+     LocalDate fechaCapt = LocalDate.parse(capt_date, format);
      
-     boolean okRegister = db.image_upload(title, description, keywords, author, creator, capt_date, save_date, title);
+     // Validar que los campos requeridos no estén vacíos
+     if (title == null || description == null || keywords == null || author == null || capt_date == null ||
+            title.trim().isEmpty() || description.trim().isEmpty() || keywords.trim().isEmpty() || 
+            author.trim().isEmpty() || capt_date.trim().isEmpty() || !fechaCapt.isAfter(fechaActual)) 
+         okRegister = false;
+     else
+         okRegister = db.image_upload(title, description, keywords, author, creator, capt_date, save_date, title);
      
      if (okRegister)
          return Response.ok().build();
@@ -117,6 +125,14 @@ public class JakartaEE91Resource {
                               @FormParam("creator") String creator,
                               @FormParam("capture") String capt_date) {
      database db = new database();
+     
+     boolean okMod  = db.image_modify(title, description, keywords, author, Integer.parseInt(id));
+     
+     if (okMod) 
+         return Response.ok().build();
+     else
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+     
  }
  /**
  * POST method to delete an existing image
@@ -144,7 +160,7 @@ public class JakartaEE91Resource {
  * @param id
  * @return
  */
- @Path("searchID/{id}")
+ /*@Path("searchID/{id}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
  public Response searchByID (@PathParam("id") int id)
@@ -153,7 +169,7 @@ public class JakartaEE91Resource {
  * @param title
  * @return
  */
- @Path("searchTitle/{title}")
+ /*@Path("searchTitle/{title}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
  public Response searchByTitle (@PathParam("title") String title)
@@ -163,7 +179,7 @@ public class JakartaEE91Resource {
  * @param date
  * @return
  */
- @Path("searchCreationDate/{date}")
+ /*@Path("searchCreationDate/{date}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
  public Response searchByCreationDate (@PathParam("date") String date)
@@ -172,7 +188,7 @@ public class JakartaEE91Resource {
  * @param author
  * @return
  */
- @Path("searchAuthor/{author}")
+ /*@Path("searchAuthor/{author}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
  public Response searchByAuthor (@PathParam("author") String author)
@@ -181,8 +197,8 @@ public class JakartaEE91Resource {
  * @param keywords
  * @return
  */
- @Path("searchKeywords/{keywords}")
+ /*@Path("searchKeywords/{keywords}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
- public Response searchByKeywords (@PathParam("keywords") String keywords)
+ public Response searchByKeywords (@PathParam("keywords") String keywords)*/
 }

@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.OutputStream;
 /**
  *
  * @author alumne
@@ -90,14 +91,19 @@ public class login extends HttpServlet {
         }
 
         // Construcción de la URL para la autenticación en el servidor remoto
-        String apiUrl = "http://localhost:8080/RestAD/resources/jakartaee9/login?username=" + username + "&password=" + password;
+        String apiUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/login";
         HttpURLConnection connection = null;
 
         try {
             URL url = new URL(apiUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
-            connection.setRequestProperty("Accept", "application/json");
+            
+            String postData = "username=" + username + "&password=" + password;
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = postData.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
 
             // Comprobar el código de respuesta
             int responseCode = connection.getResponseCode();
