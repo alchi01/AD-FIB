@@ -15,6 +15,7 @@ import jakarta.ws.rs.core.Response;
 import DB.database;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -156,6 +157,22 @@ public class JakartaEE91Resource {
          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
  }
  /**
+ * GET method to search all images
+ * @return
+ */
+ @Path("showImages")
+ @GET
+ @Produces(MediaType.APPLICATION_JSON)
+ public Response showAllImages (){
+     database db = new database();
+     
+     JsonArray listaImagenes = db.show_images();
+     if (listaImagenes != null)
+         return Response.ok(listaImagenes.toString(),MediaType.APPLICATION_JSON).build();
+     else
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+ }
+ /**
  * GET method to search images by id
  * @param id
  * @return
@@ -163,23 +180,27 @@ public class JakartaEE91Resource {
  /*@Path("searchID/{id}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
- public Response searchByID (@PathParam("id") int id)
+ public Response searchByID (@PathParam("id") int id){
+     
+ }
  /**
  * GET method to search images by title
  * @param title
  * @return
  */
- /*@Path("searchTitle/{title}")
+/*@Path("searchTitle/{title}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
- public Response searchByTitle (@PathParam("title") String title)
+ public Response searchByTitle (@PathParam("title") String title){
+     
+ }
  /**
  * GET method to search images by creation date. Date format should be
  * yyyy-mm-dd
  * @param date
  * @return
  */
- /*@Path("searchCreationDate/{date}")
+/* @Path("searchCreationDate/{date}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
  public Response searchByCreationDate (@PathParam("date") String date)
@@ -188,7 +209,7 @@ public class JakartaEE91Resource {
  * @param author
  * @return
  */
- /*@Path("searchAuthor/{author}")
+/* @Path("searchAuthor/{author}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
  public Response searchByAuthor (@PathParam("author") String author)
@@ -197,7 +218,7 @@ public class JakartaEE91Resource {
  * @param keywords
  * @return
  */
- /*@Path("searchKeywords/{keywords}")
+/* @Path("searchKeywords/{keywords}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
  public Response searchByKeywords (@PathParam("keywords") String keywords)*/
