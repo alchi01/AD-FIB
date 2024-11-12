@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.net.URLEncoder;
 import java.util.List;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -94,47 +95,71 @@ public class buscarImagen extends HttpServlet {
             System.out.println("1");
             searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/showImages";
         }
-        else if (!buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
-            && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
-            && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
-        {
-            System.out.println("2");
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle/"+ buscarTitulo;
-        }
-        else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
-            && !buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
-            && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
-        {
-            System.out.println("3");
-            int id = Integer.parseInt(buscarId);
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchID/" + id;
-        }
-        else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
-            && buscarId.trim().isEmpty() && !buscarAuthor.trim().isEmpty()
-            && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
-        {
-            System.out.println("4");            
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchAuthor/"+ buscarAuthor;
- 
-        }
-        else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
-            && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
-            && !buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
-        {
-            System.out.println("5");
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchCreationDate/"+ buscarDate;
-        }
-        else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
-            && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
-            && buscarDate.trim().isEmpty() && !buscarKeywords.trim().isEmpty())
-        {
-            System.out.println("6");            
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle/"+ buscarKeywords;
-        }
         else{
-            System.out.println("7");           
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchCombined/"+ buscarTitulo + buscarId + buscarDescripcion +buscarAuthor + buscarDate + buscarKeywords;
+            if (!buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+                && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
+                && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+            {
+                System.out.println("2");
+                searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle/"+ buscarTitulo;
+            }
+            else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+                && !buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
+                && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+            {
+                System.out.println("3");
+                int id = Integer.parseInt(buscarId);
+                searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchID/" + id;
+            }
+            else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+                && buscarId.trim().isEmpty() && !buscarAuthor.trim().isEmpty()
+                && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+            {
+                System.out.println("4");            
+                searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchAuthor/"+ buscarAuthor;
 
+            }
+            else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+                && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
+                && !buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+            {
+                System.out.println("5");
+                searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchCreationDate/"+ buscarDate;
+            }
+            else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+                && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
+                && buscarDate.trim().isEmpty() && !buscarKeywords.trim().isEmpty())
+            {
+                System.out.println("6");            
+                searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle/"+ buscarKeywords;
+            }
+            else{
+                System.out.println("7");           
+                StringBuilder searchUrlComb = new StringBuilder("http://localhost:8080/ServerRest/resources/jakartaee9/searchCombined?");
+
+                
+                if (!buscarTitulo.trim().isEmpty()) {
+                    searchUrlComb.append("title=").append(URLEncoder.encode(buscarTitulo, "UTF-8")).append("&");
+                }
+                if (!buscarDescripcion.trim().isEmpty()) {
+                    searchUrlComb.append("description=").append(URLEncoder.encode(buscarDescripcion, "UTF-8")).append("&");
+                }
+                if (!buscarAuthor.trim().isEmpty()) {
+                    searchUrlComb.append("author=").append(URLEncoder.encode(buscarAuthor, "UTF-8")).append("&");
+                }
+                if (!buscarDate.trim().isEmpty()) {
+                    searchUrlComb.append("date=").append(URLEncoder.encode(buscarDate, "UTF-8")).append("&");
+                }
+                if (!buscarKeywords.trim().isEmpty()) {
+                    searchUrlComb.append("keywords=").append(URLEncoder.encode(buscarKeywords, "UTF-8")).append("&");
+                }
+
+                if (searchUrlComb.charAt(searchUrlComb.length() - 1) == '&') {
+                    searchUrlComb.deleteCharAt(searchUrlComb.length() - 1);
+                }
+                searchUrl = searchUrlComb.toString();
+
+            }
         }
                                 
 

@@ -6,6 +6,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -272,7 +273,6 @@ public class JakartaEE91Resource {
  /**
  * GET method to search images by combination
  * @param title
- * @param id
  * @param description
  * @param author
  * @param date
@@ -282,15 +282,14 @@ public class JakartaEE91Resource {
  @Path("searchCombined")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
- public Response searchByCombination (@PathParam("title") String title,
-                                   @PathParam("id") String id,
-                                   @PathParam("description") String description,
-                                   @PathParam("author") String author,
-                                   @PathParam("date") String date,
-                                   @PathParam("keywords") String keywords){
+ public Response searchByCombination (@QueryParam("title") String title,
+                                   @QueryParam("description") String description,
+                                   @QueryParam("author") String author,
+                                   @QueryParam("date") String date,
+                                   @QueryParam("keywords") String keywords){
      database db = new database();
      
-     JsonArray listaImagenes = db.show_images_combined(title, id, description, author, date, keywords);
+     JsonArray listaImagenes = db.show_images_combined(title, description, author, date, keywords);
      if (listaImagenes != null)
          return Response.ok(listaImagenes.toString(),MediaType.APPLICATION_JSON).build();
      else

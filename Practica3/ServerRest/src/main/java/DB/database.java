@@ -126,7 +126,7 @@ public class database {
         }
         return okImage;
     }
-    public JsonArray show_images_combined(String title, String id, String description, String author, String date, String keywords){
+    public JsonArray show_images_combined(String title, String description, String author, String date, String keywords){
         
         JsonArrayBuilder listaImagenes = Json.createArrayBuilder();
         Connection connection = null;
@@ -139,9 +139,6 @@ public class database {
 
             if (title != null && !title.isEmpty()) {
                 sql += " AND TITLE LIKE ?";
-            }
-            if (id != null && !id.isEmpty()) {
-                sql += " AND ID LIKE ?";
             }
             if (description != null && !description.isEmpty()) {
                 sql += " AND DESCRIPTION LIKE ?";
@@ -164,9 +161,7 @@ public class database {
             if (title != null && !title.isEmpty()) {
                 statement.setString(paramIndex++, "%" + title + "%");
             }
-            if (id != null && !id.isEmpty()) {
-                statement.setString(paramIndex++, "%" + id + "%");
-            }
+            
             if (description != null && !description.isEmpty()) {
                 statement.setString(paramIndex++, "%" + description + "%");
             }
