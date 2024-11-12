@@ -17,6 +17,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 import java.util.ArrayList;
 /**
  *
@@ -120,8 +126,9 @@ public class database {
         }
         return okImage;
     }
-    public ArrayList<Object[]> show_images(String title, String description){
-        ArrayList<Object[]> listaImagenes = new ArrayList<>();
+    public JsonArray show_images_combined(String title, String id, String description, String author, String date, String keywords){
+        
+        JsonArrayBuilder listaImagenes = Json.createArrayBuilder();
         Connection connection = null;
 
         try {
@@ -133,9 +140,23 @@ public class database {
             if (title != null && !title.isEmpty()) {
                 sql += " AND TITLE LIKE ?";
             }
+            if (id != null && !id.isEmpty()) {
+                sql += " AND ID LIKE ?";
+            }
             if (description != null && !description.isEmpty()) {
                 sql += " AND DESCRIPTION LIKE ?";
             }
+            if (author != null && !author.isEmpty()) {
+                sql += " AND AUTHOR LIKE ?";
+            }
+            
+            if (date != null && !date.isEmpty()) {
+                sql += " AND CAPTURE_DATE LIKE ?";
+            }
+            if (keywords != null && !keywords.isEmpty()) {
+                sql += " AND KEYWORDS LIKE ?";
+            }
+
 
             PreparedStatement statement = connection.prepareStatement(sql);
             int paramIndex = 1;
@@ -143,25 +164,37 @@ public class database {
             if (title != null && !title.isEmpty()) {
                 statement.setString(paramIndex++, "%" + title + "%");
             }
+            if (id != null && !id.isEmpty()) {
+                statement.setString(paramIndex++, "%" + id + "%");
+            }
             if (description != null && !description.isEmpty()) {
                 statement.setString(paramIndex++, "%" + description + "%");
+            }
+            if (author != null && !author.isEmpty()) {
+                statement.setString(paramIndex++, "%" + author + "%");
+            }
+            
+            if (date != null && !date.isEmpty()) {
+                statement.setString(paramIndex++, "%" + date + "%");
+            }
+            if (keywords != null && !keywords.isEmpty()) {
+                statement.setString(paramIndex++, "%" + keywords + "%");
             }
 
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                Object[] filaImagen = new Object[9];
-                filaImagen[0] = resultSet.getInt("ID");
-                filaImagen[1] = resultSet.getString("TITLE");
-                filaImagen[2] = resultSet.getString("DESCRIPTION");
-                filaImagen[3] = resultSet.getString("KEYWORDS");
-                filaImagen[4] = resultSet.getString("AUTHOR");
-                filaImagen[5] = resultSet.getString("CREATOR");
-                filaImagen[6] = resultSet.getString("CAPTURE_DATE");
-                filaImagen[7] = resultSet.getString("STORAGE_DATE");
-                filaImagen[8] = resultSet.getString("FILENAME");
-
-                listaImagenes.add(filaImagen);
+                JsonObjectBuilder listaObjectImagenes = Json.createObjectBuilder()
+                .add("id", resultSet.getString("ID"))
+                .add("title", resultSet.getString("TITLE"))
+                .add("description", resultSet.getString("DESCRIPTION"))
+                .add("keywords", resultSet.getString("KEYWORDS"))
+                .add("author", resultSet.getString("AUTHOR"))
+                .add("creator", resultSet.getString("CREATOR"))
+                .add("captureDate", resultSet.getString("CAPTURE_DATE"))
+                .add("storageDate", resultSet.getString("STORAGE_DATE"))
+                .add("filename", resultSet.getString("FILENAME"));
+                listaImagenes.add(listaObjectImagenes.build());
             }
 
         } catch (ClassNotFoundException | SQLException e) {
@@ -176,10 +209,311 @@ public class database {
             }
         }
 
-        return listaImagenes;
+        return listaImagenes.build();
     }
 
- 
+    public JsonArray show_images_by_title(String title){
+        JsonArrayBuilder listaImagenes = Json.createArrayBuilder();
+        Connection connection = null;
+
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+
+            String sql = "SELECT * FROM IMAGE WHERE 1=1";
+
+            if (title != null && !title.isEmpty()) {
+                sql += " AND TITLE LIKE ?";
+            }
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramIndex = 1;
+
+            if (title != null && !title.isEmpty()) {
+                statement.setString(paramIndex++, "%" + title + "%");
+            }
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                 JsonObjectBuilder listaObjectImagenes = Json.createObjectBuilder()
+                .add("id", resultSet.getString("ID"))
+                .add("title", resultSet.getString("TITLE"))
+                .add("description", resultSet.getString("DESCRIPTION"))
+                .add("keywords", resultSet.getString("KEYWORDS"))
+                .add("author", resultSet.getString("AUTHOR"))
+                .add("creator", resultSet.getString("CREATOR"))
+                .add("captureDate", resultSet.getString("CAPTURE_DATE"))
+                .add("storageDate", resultSet.getString("STORAGE_DATE"))
+                .add("filename", resultSet.getString("FILENAME"));
+                listaImagenes.add(listaObjectImagenes.build());
+
+            }
+
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        return listaImagenes.build();
+    }
+    
+    public JsonObject show_images_by_id(String id){
+        JsonObjectBuilder listaObjectImagenes = Json.createObjectBuilder();
+        Connection connection = null;
+      
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+
+            String sql = "SELECT * FROM IMAGE WHERE 1=1";
+
+            if (id != null && !id.isEmpty()) {
+                sql += " AND ID LIKE ?";
+            }
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramIndex = 1;
+
+            if (id != null && !id.isEmpty()) {
+                statement.setString(paramIndex++, "%" + id + "%");
+            }
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                listaObjectImagenes
+                .add("id", resultSet.getString("ID"))
+                .add("title", resultSet.getString("TITLE"))
+                .add("description", resultSet.getString("DESCRIPTION"))
+                .add("keywords", resultSet.getString("KEYWORDS"))
+                .add("author", resultSet.getString("AUTHOR"))
+                .add("creator", resultSet.getString("CREATOR"))
+                .add("captureDate", resultSet.getString("CAPTURE_DATE"))
+                .add("storageDate", resultSet.getString("STORAGE_DATE"))
+                .add("filename", resultSet.getString("FILENAME"));
+
+               
+            }
+
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        return listaObjectImagenes.build();
+    }
+    
+    public JsonArray show_images_by_author(String author){
+                JsonArrayBuilder listaImagenes = Json.createArrayBuilder();
+        Connection connection = null;
+
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+
+            String sql = "SELECT * FROM IMAGE WHERE 1=1";
+
+            if (author != null && !author.isEmpty()) {
+                sql += " AND AUTHOR LIKE ?";
+            }
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramIndex = 1;
+
+            if (author != null && !author.isEmpty()) {
+                statement.setString(paramIndex++, "%" + author + "%");
+            }
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                 JsonObjectBuilder listaObjectImagenes = Json.createObjectBuilder()
+                .add("id", resultSet.getString("ID"))
+                .add("title", resultSet.getString("TITLE"))
+                .add("description", resultSet.getString("DESCRIPTION"))
+                .add("keywords", resultSet.getString("KEYWORDS"))
+                .add("author", resultSet.getString("AUTHOR"))
+                .add("creator", resultSet.getString("CREATOR"))
+                .add("captureDate", resultSet.getString("CAPTURE_DATE"))
+                .add("storageDate", resultSet.getString("STORAGE_DATE"))
+                .add("filename", resultSet.getString("FILENAME"));
+                listaImagenes.add(listaObjectImagenes.build());
+
+            }
+
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        return listaImagenes.build();
+    }
+    
+    public JsonArray show_images_by_date(String date){
+                JsonArrayBuilder listaImagenes = Json.createArrayBuilder();
+        Connection connection = null;
+
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+
+            String sql = "SELECT * FROM IMAGE WHERE 1=1";
+
+            if (date != null && !date.isEmpty()) {
+                sql += " AND DATE LIKE ?";
+            }
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramIndex = 1;
+
+            if (date != null && !date.isEmpty()) {
+                statement.setString(paramIndex++, "%" + date + "%");
+            }
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                 JsonObjectBuilder listaObjectImagenes = Json.createObjectBuilder()
+                .add("id", resultSet.getString("ID"))
+                .add("title", resultSet.getString("TITLE"))
+                .add("description", resultSet.getString("DESCRIPTION"))
+                .add("keywords", resultSet.getString("KEYWORDS"))
+                .add("author", resultSet.getString("AUTHOR"))
+                .add("creator", resultSet.getString("CREATOR"))
+                .add("captureDate", resultSet.getString("CAPTURE_DATE"))
+                .add("storageDate", resultSet.getString("STORAGE_DATE"))
+                .add("filename", resultSet.getString("FILENAME"));
+                listaImagenes.add(listaObjectImagenes.build());
+
+            }
+
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        return listaImagenes.build();
+    }
+    
+    public JsonArray show_images_by_keywords(String keywords){
+                JsonArrayBuilder listaImagenes = Json.createArrayBuilder();
+        Connection connection = null;
+
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+
+            String sql = "SELECT * FROM IMAGE WHERE 1=1";
+
+            if (keywords != null && !keywords.isEmpty()) {
+                sql += " AND KEYWORDS LIKE ?";
+            }
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+            int paramIndex = 1;
+
+            if (keywords != null && !keywords.isEmpty()) {
+                statement.setString(paramIndex++, "%" + keywords + "%");
+            }
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                 JsonObjectBuilder listaObjectImagenes = Json.createObjectBuilder()
+                .add("id", resultSet.getString("ID"))
+                .add("title", resultSet.getString("TITLE"))
+                .add("description", resultSet.getString("DESCRIPTION"))
+                .add("keywords", resultSet.getString("KEYWORDS"))
+                .add("author", resultSet.getString("AUTHOR"))
+                .add("creator", resultSet.getString("CREATOR"))
+                .add("captureDate", resultSet.getString("CAPTURE_DATE"))
+                .add("storageDate", resultSet.getString("STORAGE_DATE"))
+                .add("filename", resultSet.getString("FILENAME"));
+                listaImagenes.add(listaObjectImagenes.build());
+
+            }
+
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        return listaImagenes.build();
+    }
+    
+     public JsonArray show_images(){
+        
+        JsonArrayBuilder listaImagenes = Json.createArrayBuilder();
+        Connection connection = null;
+
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+
+            String sql = "SELECT * FROM IMAGE ";          
+            PreparedStatement statement = connection.prepareStatement(sql);          
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                JsonObjectBuilder listaObjectImagenes = Json.createObjectBuilder()
+                .add("id", resultSet.getString("ID"))
+                .add("title", resultSet.getString("TITLE"))
+                .add("description", resultSet.getString("DESCRIPTION"))
+                .add("keywords", resultSet.getString("KEYWORDS"))
+                .add("author", resultSet.getString("AUTHOR"))
+                .add("creator", resultSet.getString("CREATOR"))
+                .add("captureDate", resultSet.getString("CAPTURE_DATE"))
+                .add("storageDate", resultSet.getString("STORAGE_DATE"))
+                .add("filename", resultSet.getString("FILENAME"));
+                listaImagenes.add(listaObjectImagenes.build());
+            }
+
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        return listaImagenes.build();
+    }
+    
     
     
     public boolean eliminate(int ID) {

@@ -32,6 +32,14 @@
                 <input type="text" name="buscarTitulo" value="${param.buscarTitulo}">
                 <label for="buscarDescripcion">Descripción:</label>
                 <input type="text" name="buscarDescripcion" value="${param.buscarDescripcion}">
+                <label for="buscarId">Id:</label>
+                <input type="text" name="buscarId" value="${param.buscarId}">
+                <label for="buscarAuthor">Autor:</label>
+                <input type="text" name="buscarAutor" value="${param.buscarAutor}">
+                <label for="buscarDate">Date:</label>
+                <input type="text" name="buscarDate" value="${param.buscarDate}">
+                <label for="buscarKeywords">Keywords:</label>
+                <input type="text" name="buscarKeywords" value="${param.buscarKeywords}">
                 <button type="submit">Buscar</button>
             </p>
         </form>

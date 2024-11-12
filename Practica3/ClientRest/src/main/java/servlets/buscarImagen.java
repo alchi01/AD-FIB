@@ -67,29 +67,61 @@ public class buscarImagen extends HttpServlet {
             response.sendRedirect("login.jsp");
             return;
         }
-
+        String searchUrl = "";
         // Obtener los parámetros de búsqueda
         String buscarTitulo = request.getParameter("buscarTitulo");
         String buscarDescripcion = request.getParameter("buscarDescripcion");
+        String buscarId = request.getParameter("buscarId");
+        String buscarAuthor = request.getParameter("buscarAuthor");
+        String buscarDate = request.getParameter("buscarDate");
+        String buscarKeywords = request.getParameter("buscarKeywords");
 
         // Validación de los parámetros de búsqueda
-        if (buscarTitulo == null && buscarDescripcion == null) {
+        if (buscarTitulo == null && buscarDescripcion == null 
+            && buscarId == null && buscarAuthor == null 
+            && buscarDate == null && buscarKeywords == null) {
             response.sendRedirect("menu.jsp");
             return;
         }
 
         List<Object[]> listaImagenes = new ArrayList<>();
         HttpURLConnection connection = null;
+        if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+            && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
+            && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/showImages";
+        else if (!buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+            && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
+            && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle"+ buscarTitulo;
+        else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+            && !buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
+            && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchId"+ buscarId;
+        else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+            && buscarId.trim().isEmpty() && !buscarAuthor.trim().isEmpty()
+            && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchAuthor"+ buscarAuthor;
+        else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+            && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
+            && !buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchDate"+ buscarDate;
+        else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
+            && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
+            && buscarDate.trim().isEmpty() && !buscarKeywords.trim().isEmpty())
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle"+ buscarKeywords;
+        else
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchCombined"+ buscarTitulo + buscarId + buscarDescripcion
+                    +buscarAuthor + buscarDate + buscarKeywords;            
 
         try {
             // Construcción de la URL para la búsqueda en el servidor remoto
-            String searchUrl = "http://localhost:8080/RestAD/resources/jakartaee9/searchImages"
-                    + "?title=" + buscarTitulo + "&description=" + buscarDescripcion;
+            
 
             URL url = new URL(searchUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept", "application/json");
+            connection.setDoOutput(true);
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
