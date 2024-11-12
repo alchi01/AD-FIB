@@ -50,14 +50,15 @@ public class eliminarImagen extends HttpServlet {
         String imagenIdStr = request.getParameter("imagenId");
         String message;
 
-
+        
         try {
-            System.out.println("he entrado a eliminar");
+            
             String apiUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/delete";
             HttpURLConnection connection = null;
             URL url = new URL(apiUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
             
             String postData = "id=" + imagenIdStr;
             try (OutputStream os = connection.getOutputStream()) {

@@ -49,18 +49,17 @@
                 <p>Description: ${filaImagen.description}</p>
                 <img src="${filaImagen.filename}" width="200" height="200">
 
-                <form action="/modificarImagen.jsp" method="GET">
-                    <input type="hidden" name="imagenId" value="${filaImagen.id}" /> 
-                    <c:out value="${filaImagen.id}" />
-                    <input type="hidden" name="imagenTitle" value="${filaImagen.title}" /> 
+                <form action="modificarImagen.jsp" method="GET">
+                    <input type="hidden" name="imagenId" value=${filaImagen.id} /> 
+                    <input type="hidden" name="imagenTitle" value=${filaImagen.title} /> 
                    <!-- <input type="hidden" name="imagenFile" value="${filaImagen.urlImage}" /> -->
                     <button type="submit">Modificar imagen</button>
                 </form>
 
 
-                <form action="/eliminarImagen.jsp" method="GET">
-                    <input type="hidden" name="imagenId" value="${filaImagen.id}" /> <!-- ID de la imagen -->
-                    <input type="hidden" name="imagenTitle" value="${filaImagen.description}" /> <!-- TITLE de la imagen 
+                <form action="eliminarImagen.jsp" method="GET">
+                    <input type="hidden" name="imagenId" value=${filaImagen.id} /> <!-- ID de la imagen -->
+                    <input type="hidden" name="imagenTitle" value=${filaImagen.title} /> <!-- TITLE de la imagen 
                     <input type="hidden" name="imagenFile" value="${filaImagen.urlImage}" /> <!-- FILE de la imagen -->
                     <button type="submit">Eliminar imagen</button>
                 </form>

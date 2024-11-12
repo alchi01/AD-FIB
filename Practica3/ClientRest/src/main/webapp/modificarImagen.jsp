@@ -36,7 +36,7 @@
             <p align="center"><label for="titulo">Nuevo Título:</label><input type="text" name="newTit"></p>
             <p align="center"><label for="titulo">Nueva Descripcion:</label><input type="text" name="newDesc"></p>
             <p align="center"><label for="titulo">Nuevas Keywords:</label><input type="text" name="newKey"></p>
-            <p align="center"><label for="titulo">Nuevo nombre de la imagen</label><input type="text" name="newImg"></p>
+            <p align="center"><label for="titulo">Nuevo nombre del Autor</label><input type="text" name="autor"></p>
             <p align="center"><input type="submit" value="Modificar"></p>
             <input type="hidden" name="imagenId" value="<%= imagenId %>">
         </form>

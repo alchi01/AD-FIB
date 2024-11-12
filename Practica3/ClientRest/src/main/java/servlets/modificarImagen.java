@@ -56,7 +56,7 @@ public class modificarImagen extends HttpServlet {
 
 
         try {
-            String urlString = "http://localhost:8080/RestAD/resources/jakartaee9/modify"; 
+            String urlString = "http://localhost:8080/ServerRest/resources/jakartaee9/modify"; 
             HttpURLConnection connection = null;
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
