@@ -264,7 +264,7 @@ public class database {
         return listaImagenes.build();
     }
     
-    public JsonObject show_images_by_id(String id){
+    public JsonObject show_images_by_id(int id){
         JsonObjectBuilder listaObjectImagenes = Json.createObjectBuilder();
         Connection connection = null;
       
@@ -274,21 +274,17 @@ public class database {
 
             String sql = "SELECT * FROM IMAGE WHERE 1=1";
 
-            if (id != null && !id.isEmpty()) {
-                sql += " AND ID LIKE ?";
-            }
-
+            
             PreparedStatement statement = connection.prepareStatement(sql);
-            int paramIndex = 1;
 
-            if (id != null && !id.isEmpty()) {
-                statement.setString(paramIndex++, "%" + id + "%");
-            }
+            
+            statement.setInt(1, id);
+            
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 listaObjectImagenes
-                .add("id", resultSet.getString("ID"))
+                .add("id", id)
                 .add("title", resultSet.getString("TITLE"))
                 .add("description", resultSet.getString("DESCRIPTION"))
                 .add("keywords", resultSet.getString("KEYWORDS"))
@@ -379,7 +375,8 @@ public class database {
             String sql = "SELECT * FROM IMAGE WHERE 1=1";
 
             if (date != null && !date.isEmpty()) {
-                sql += " AND DATE LIKE ?";
+                sql += " AND CAPTURE_DATE LIKE ?";
+                System.out.println(date);
             }
 
             PreparedStatement statement = connection.prepareStatement(sql);

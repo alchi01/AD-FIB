@@ -52,9 +52,9 @@ public class eliminarImagen extends HttpServlet {
 
 
         try {
-            String apiUrl = "http://localhost:8080/RestAD/resources/jakartaee9/delete";
+            System.out.println("he entrado a eliminar");
+            String apiUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/delete";
             HttpURLConnection connection = null;
-
             URL url = new URL(apiUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -67,6 +67,7 @@ public class eliminarImagen extends HttpServlet {
             
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
+                System.out.println("elim1");
                 request.setAttribute("message", "La imagen ha sido eliminada correctamente");
                 RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
                 rd.forward(request, response);

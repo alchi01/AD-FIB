@@ -5,7 +5,7 @@
 --%>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+         pageEncoding="UTF-8"%>
 
 <% 
     HttpSession usersession = request.getSession(false);
@@ -24,9 +24,9 @@
     </head>
     <body>
         <h2>Imágenes del Usuario</h2>
-         <p align="left"> <button onclick="location.href='menu.jsp'"> Menu </button>
+        <p align="left"> <button onclick="location.href = 'menu.jsp'"> Menu </button>
         <form action = "buscarImagen" method = "GET">
-            
+
             <p align="center">
                 <label for="buscarTitulo">Título:</label>
                 <input type="text" name="buscarTitulo" value="${param.buscarTitulo}">
@@ -37,7 +37,7 @@
                 <label for="buscarAuthor">Autor:</label>
                 <input type="text" name="buscarAutor" value="${param.buscarAutor}">
                 <label for="buscarDate">Date:</label>
-                <input type="text" name="buscarDate" value="${param.buscarDate}">
+                <input type="date" name="buscarDate" value="${param.buscarDate}">
                 <label for="buscarKeywords">Keywords:</label>
                 <input type="text" name="buscarKeywords" value="${param.buscarKeywords}">
                 <button type="submit">Buscar</button>
@@ -47,27 +47,23 @@
             <div align="center">
                 <p align="center">Title: ${filaImagen.title}</p>
                 <p>Description: ${filaImagen.description}</p>
-                <img src="/home/alummne/Descargas/${filaImagen.urlImage}" width="200" height="200">
-                <div align="center">
-                    
-                    <form action="modificarImagen.jsp" method="GET">
-                        <input type="hidden" name="imagenId" value="${filaImagen.title}" /> 
-                        <input type="hidden" name="imagenTitle" value="${filaImagen.description}" /> 
-                        <input type="hidden" name="imagenFile" value="${filaImagen.urlImage}" />
-                        <button type="submit">Modificar imagen</button>
-                    </form>
+                <img src="${filaImagen.filename}" width="200" height="200">
 
-                    
-                    <form action="eliminarImagen.jsp" method="GET">
-                        <input type="hidden" name="imagenId" value="${filaImagen.title}}" /> <!-- ID de la imagen -->
-                        <input type="hidden" name="imagenTitle" value="${filaImagen.description}" /> <!-- TITLE de la imagen -->
-                        <input type="hidden" name="imagenFile" value="${filaImagen.urlImage}" /> <!-- FILE de la imagen -->
-                        <button type="submit">Eliminar imagen</button>
-                    </form>
-                </div>
-                
+                <form action="/modificarImagen.jsp" method="GET">
+                    <input type="hidden" name="imagenId" value="${filaImagen.id}" /> 
+                    <c:out value="${filaImagen.id}" />
+                    <input type="hidden" name="imagenTitle" value="${filaImagen.title}" /> 
+                   <!-- <input type="hidden" name="imagenFile" value="${filaImagen.urlImage}" /> -->
+                    <button type="submit">Modificar imagen</button>
+                </form>
 
 
+                <form action="/eliminarImagen.jsp" method="GET">
+                    <input type="hidden" name="imagenId" value="${filaImagen.id}" /> <!-- ID de la imagen -->
+                    <input type="hidden" name="imagenTitle" value="${filaImagen.description}" /> <!-- TITLE de la imagen 
+                    <input type="hidden" name="imagenFile" value="${filaImagen.urlImage}" /> <!-- FILE de la imagen -->
+                    <button type="submit">Eliminar imagen</button>
+                </form>
             </div>
             <hr>
         </c:forEach>

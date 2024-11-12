@@ -145,11 +145,10 @@ public class JakartaEE91Resource {
  @POST
  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
  @Produces(MediaType.APPLICATION_JSON)
- public Response deleteImage (@FormParam("id") String id,
-                              @FormParam("creator") String creator) {
+ public Response deleteImage (@FormParam("id") String id) {
      database db = new database();
      
-     
+     System.out.println(id);
      boolean okDelete = db.eliminate(Integer.parseInt(id));
      
      if (okDelete)
@@ -178,22 +177,35 @@ public class JakartaEE91Resource {
  * @param id
  * @return
  */
- /*@Path("searchID/{id}")
+ @Path("searchID/{id}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
  public Response searchByID (@PathParam("id") int id){
+     database db = new database();
      
+     JsonObject listaImagenes = db.show_images_by_id(id);
+     if (listaImagenes != null)
+         return Response.ok(listaImagenes.toString(),MediaType.APPLICATION_JSON).build();
+     else
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
  }
  /**
  * GET method to search images by title
  * @param title
  * @return
  */
-/*@Path("searchTitle/{title}")
+@Path("searchTitle/{title}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
  public Response searchByTitle (@PathParam("title") String title){
      
+    database db = new database();
+     
+     JsonArray listaImagenes = db.show_images_by_title(title);
+     if (listaImagenes != null)
+         return Response.ok(listaImagenes.toString(),MediaType.APPLICATION_JSON).build();
+     else
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
  }
  /**
  * GET method to search images by creation date. Date format should be
@@ -201,26 +213,88 @@ public class JakartaEE91Resource {
  * @param date
  * @return
  */
-/* @Path("searchCreationDate/{date}")
+@Path("searchCreationDate/{date}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
- public Response searchByCreationDate (@PathParam("date") String date)
+ public Response searchByCreationDate (@PathParam("date") String date) {
+     database db = new database();
+     DateTimeFormatter format1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+     DateTimeFormatter format2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+     LocalDate fechaCapt = LocalDate.parse(date, format2);
+     String date1 = fechaCapt.format(format1);
+     
+     
+     
+     JsonArray listaImagenes = db.show_images_by_date(date1);
+     if (listaImagenes != null && !fechaCapt.isAfter(LocalDate.now()))
+         return Response.ok(listaImagenes.toString(),MediaType.APPLICATION_JSON).build();
+     else
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+ }
+ 
  /**
  * GET method to search images by author
  * @param author
  * @return
  */
-/* @Path("searchAuthor/{author}")
+ @Path("searchAuthor/{author}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
- public Response searchByAuthor (@PathParam("author") String author)
+ public Response searchByAuthor (@PathParam("author") String author){
+     database db = new database();
+     
+     JsonArray listaImagenes = db.show_images_by_author(author);
+     if (listaImagenes != null)
+         return Response.ok(listaImagenes.toString(),MediaType.APPLICATION_JSON).build();
+     else
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+ 
+ }
  /**
  * GET method to search images by keyword
  * @param keywords
  * @return
  */
-/* @Path("searchKeywords/{keywords}")
+ @Path("searchKeywords/{keywords}")
  @GET
  @Produces(MediaType.APPLICATION_JSON)
- public Response searchByKeywords (@PathParam("keywords") String keywords)*/
+ public Response searchByKeywords (@PathParam("keywords") String keywords){
+     database db = new database();
+     
+     JsonArray listaImagenes = db.show_images_by_keywords(keywords);
+     if (listaImagenes != null)
+         return Response.ok(listaImagenes.toString(),MediaType.APPLICATION_JSON).build();
+     else
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+
+ }
+ 
+ /**
+ * GET method to search images by combination
+ * @param title
+ * @param id
+ * @param description
+ * @param author
+ * @param date
+ * @param keywords
+ * @return
+ */
+ @Path("searchCombined")
+ @GET
+ @Produces(MediaType.APPLICATION_JSON)
+ public Response searchByCombination (@PathParam("title") String title,
+                                   @PathParam("id") String id,
+                                   @PathParam("description") String description,
+                                   @PathParam("author") String author,
+                                   @PathParam("date") String date,
+                                   @PathParam("keywords") String keywords){
+     database db = new database();
+     
+     JsonArray listaImagenes = db.show_images_combined(title, id, description, author, date, keywords);
+     if (listaImagenes != null)
+         return Response.ok(listaImagenes.toString(),MediaType.APPLICATION_JSON).build();
+     else
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+
+ }
 }

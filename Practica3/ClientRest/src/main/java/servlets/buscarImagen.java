@@ -68,7 +68,7 @@ public class buscarImagen extends HttpServlet {
             response.sendRedirect("login.jsp");
             return;
         }
-        String searchUrl = "";
+        String searchUrl;
         // Obtener los parámetros de búsqueda
         String buscarTitulo = request.getParameter("buscarTitulo");
         String buscarDescripcion = request.getParameter("buscarDescripcion");
@@ -99,22 +99,22 @@ public class buscarImagen extends HttpServlet {
             && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
         {
             System.out.println("2");
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle"+ buscarTitulo;
-
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle/"+ buscarTitulo;
         }
         else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
             && !buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
             && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
         {
             System.out.println("3");
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchId"+ buscarId;
+            int id = Integer.parseInt(buscarId);
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchID/" + id;
         }
         else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
             && buscarId.trim().isEmpty() && !buscarAuthor.trim().isEmpty()
             && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
         {
             System.out.println("4");            
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchAuthor"+ buscarAuthor;
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchAuthor/"+ buscarAuthor;
  
         }
         else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
@@ -122,18 +122,18 @@ public class buscarImagen extends HttpServlet {
             && !buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
         {
             System.out.println("5");
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchDate"+ buscarDate;
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchCreationDate/"+ buscarDate;
         }
         else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
             && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
             && buscarDate.trim().isEmpty() && !buscarKeywords.trim().isEmpty())
         {
             System.out.println("6");            
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle"+ buscarKeywords;
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle/"+ buscarKeywords;
         }
         else{
             System.out.println("7");           
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchCombined"+ buscarTitulo + buscarId + buscarDescripcion +buscarAuthor + buscarDate + buscarKeywords;
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchCombined/"+ buscarTitulo + buscarId + buscarDescripcion +buscarAuthor + buscarDate + buscarKeywords;
 
         }
                                 
