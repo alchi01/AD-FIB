@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import jakarta.servlet.RequestDispatcher;
@@ -72,47 +73,70 @@ public class buscarImagen extends HttpServlet {
         String buscarTitulo = request.getParameter("buscarTitulo");
         String buscarDescripcion = request.getParameter("buscarDescripcion");
         String buscarId = request.getParameter("buscarId");
-        String buscarAuthor = request.getParameter("buscarAuthor");
+        String buscarAuthor = request.getParameter("buscarAutor");
         String buscarDate = request.getParameter("buscarDate");
         String buscarKeywords = request.getParameter("buscarKeywords");
 
         // Validación de los parámetros de búsqueda
-        if (buscarTitulo == null && buscarDescripcion == null 
-            && buscarId == null && buscarAuthor == null 
-            && buscarDate == null && buscarKeywords == null) {
+        if (buscarTitulo == null || buscarDescripcion == null 
+            || buscarId == null || buscarAuthor == null 
+            || buscarDate == null || buscarKeywords == null) {
             response.sendRedirect("menu.jsp");
             return;
         }
 
-        List<Object[]> listaImagenes = new ArrayList<>();
+        List<JsonObject> listaImagenes = new ArrayList<>();
         HttpURLConnection connection = null;
         if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
             && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
             && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+        {
+            System.out.println("1");
             searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/showImages";
+        }
         else if (!buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
             && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
             && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+        {
+            System.out.println("2");
             searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle"+ buscarTitulo;
+
+        }
         else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
             && !buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
             && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+        {
+            System.out.println("3");
             searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchId"+ buscarId;
+        }
         else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
             && buscarId.trim().isEmpty() && !buscarAuthor.trim().isEmpty()
             && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+        {
+            System.out.println("4");            
             searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchAuthor"+ buscarAuthor;
+ 
+        }
         else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
             && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
             && !buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
+        {
+            System.out.println("5");
             searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchDate"+ buscarDate;
+        }
         else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
             && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
             && buscarDate.trim().isEmpty() && !buscarKeywords.trim().isEmpty())
+        {
+            System.out.println("6");            
             searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle"+ buscarKeywords;
-        else
-            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchCombined"+ buscarTitulo + buscarId + buscarDescripcion
-                    +buscarAuthor + buscarDate + buscarKeywords;            
+        }
+        else{
+            System.out.println("7");           
+            searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchCombined"+ buscarTitulo + buscarId + buscarDescripcion +buscarAuthor + buscarDate + buscarKeywords;
+
+        }
+                                
 
         try {
             // Construcción de la URL para la búsqueda en el servidor remoto
@@ -125,44 +149,41 @@ public class buscarImagen extends HttpServlet {
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
+                System.out.println("8");           
 
                 // Procesamiento de la respuesta JSON del servidor
                 try (JsonReader jsonReader = Json.createReader(new InputStreamReader(connection.getInputStream()))) {
                     JsonArray jsonArray = jsonReader.readArray();
+                    System.out.println("9");           
 
                     // Iteración de cada objeto JSON y almacenamiento en la lista de imágenes
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject jsonImage = jsonArray.getJsonObject(i);
-                        String title = jsonImage.getString("title");
-                        String description = jsonImage.getString("description");
-                        String urlImage = jsonImage.getString("urlImage");
-                        String author = jsonImage.getString("author");
-                        String creationDate = jsonImage.getString("creationDate");
-
+                        
                         // Solo añadir las imágenes del usuario actual
-                        if (jsonImage.getString("user").equals(user)) {
-                            listaImagenes.add(new Object[]{title, description, urlImage, author, creationDate});
+                        if (jsonImage.getString("creator").equals(user)) {
+                            System.out.println("11");  
+                            listaImagenes.add(jsonImage);
                         }
                     }
                 }
             } else {
                 // Error de conexión, redirigir a una página de error
-                request.setAttribute("tipus_error", "connexio");
+                request.setAttribute("TError", "image_error");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
                 rd.forward(request, response);
                 return;
             }
+            connection.disconnect();
         } catch (Exception e) {
             // Error en la conexión HTTP o en el procesamiento de JSON
-            request.setAttribute("tipus_error", "connexio");
+            System.out.println("10");           
+            request.setAttribute("TError", "image_error");
             RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
             rd.forward(request, response);
             return;
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
+        } 
+        
 
         // Almacenar los resultados de búsqueda en el request y reenviar a buscarImagen.jsp
         request.setAttribute("imagenesFiltradas", listaImagenes);
