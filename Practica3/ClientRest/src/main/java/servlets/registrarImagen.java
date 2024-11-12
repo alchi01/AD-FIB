@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import jakarta.servlet.http.HttpSession;
+import java.io.File;
 
 /**
  *
@@ -32,6 +33,8 @@ import jakarta.servlet.http.HttpSession;
                  maxRequestSize = 1024 * 1024 * 50)   // 50MB
 @WebServlet(name = "registrarImagen", urlPatterns = {"/registrarImagen"})
 public class registrarImagen extends HttpServlet {
+    
+    int cont = 0;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -62,76 +65,66 @@ public class registrarImagen extends HttpServlet {
         HttpSession session = request.getSession();
         String user = (String) session.getAttribute("user");
         String fileName = filePart.getSubmittedFileName();
+        
+        
+        //String uploadPath = UPLOAD_DIRECTORY + File.separator + fileName;
 
-        // Validar que los campos requeridos no estén vacíos
-        if (titulo == null || descripcion == null || keywords == null || author == null || fechaCapt == null ||
-            titulo.trim().isEmpty() || descripcion.trim().isEmpty() || keywords.trim().isEmpty() || 
-            author.trim().isEmpty() || fechaCapt.trim().isEmpty()) {
-            request.setAttribute("TError", "Todos los campos son obligatorios.");
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.forward(request, response);
-            return;
-        }
 
-        // Preparar la solicitud al servidor REST
-        String urlString = "http://localhost:8080/RestAD/resources/jakartaee9/uploadImage"; // Cambia esto a la URL correcta
-        HttpURLConnection connection = null;
 
         try {
-            URL url = new URL(urlString);
-            connection = (HttpURLConnection) url.openConnection();
+            //String uploadPath = getServletContext().getRealPath("") + File.separator + cont;
+            String uploadPath = System.getProperty("java.io.tmpdir") + File.separator + cont;
+            System.out.println("Archivo guardado en: " + uploadPath);
+            File file = new File(uploadPath);
+            try (InputStream input = filePart.getInputStream()) {
+                Files.copy(input, file.toPath());
+                System.out.println("Archivo " + fileName + " ha sido subido corectamente");
+            } catch (Exception e) {
+                request.setAttribute("TError", "image_error");
+                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+                rd.forward(request, response);
+            }
+            String apiUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/register";
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
+            
             connection.setDoOutput(true);
 
-            // Crear el cuerpo de la solicitud en formato JSON
-            JsonObject jsonInput = Json.createObjectBuilder()
-                    .add("title", titulo)
-                    .add("description", descripcion)
-                    .add("keywords", keywords)
-                    .add("author", author)
-                    .add("fechaCapt", fechaCapt)
-                    .add("user", user)
-                    .build();
+            String postData = "title=" + titulo + "&description=" + descripcion + "&keywords=" + keywords +
+                              "&author=" + author + "&creator=" + user + "&capture=" + fechaCapt + "&filename=" + fileName;
 
-            // Enviar los datos JSON
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonInput.toString().getBytes("utf-8");
+                byte[] input = postData.getBytes("utf-8");
                 os.write(input, 0, input.length);
-            }
 
-            // Enviar el archivo de imagen
-            try (InputStream input = filePart.getInputStream()) {
-                // Enviar el archivo como parte de la solicitud
-                OutputStream os = connection.getOutputStream();
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = input.read(buffer)) != -1) {
-                    os.write(buffer, 0, bytesRead);
-                }
-                os.flush();
             }
+            
 
             // Leer la respuesta del servidor
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
+                ++cont;
                 request.setAttribute("message", "Se ha subido la imagen correctamente.");
-                RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
-                rd.forward(request, response);
+                //if (!response.isCommitted()) {
+                    RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
+                    rd.forward(request, response);
+                //}
             } else {
                 request.setAttribute("TError", "Error al subir la imagen. Código de respuesta: " + responseCode);
-                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-                rd.forward(request, response);
+                //if (!response.isCommitted()) {
+                    RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+                    rd.forward(request, response);
+                //}
             }
+            connection.disconnect();
         } catch (Exception e) {
             request.setAttribute("TError", "Error al procesar la solicitud: " + e.getMessage());
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.forward(request, response);
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
+            //if (!response.isCommitted()) {
+                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+                rd.forward(request, response);
+            //}
+        } 
     }
 
     @Override

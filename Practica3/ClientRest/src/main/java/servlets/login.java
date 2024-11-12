@@ -99,7 +99,6 @@ public class login extends HttpServlet {
             connection.setRequestMethod("POST");
             
             connection.setDoOutput(true);
-            System.out.println("Estoy aqui 1");
             String postData = "username=" + username + "&password=" + password;
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = postData.getBytes("utf-8");
@@ -107,22 +106,18 @@ public class login extends HttpServlet {
             }
 
             // Comprobar el código de respuesta
-            System.out.println("Estoy aqui 2");
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 HttpSession session = request.getSession();
-                System.out.println("Estoy aqui 3");
                 session.setAttribute("user", username);
                 response.sendRedirect("menu.jsp");
             } else {
-                System.out.println("Estoy aqui 4");
                 request.setAttribute("TError", "login_error");
                 RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
                 rd.forward(request, response);
             }
             connection.disconnect();
         } catch (Exception e) {
-            System.out.println("Estoy aqui 5");
             request.setAttribute("TError", "login_error");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);

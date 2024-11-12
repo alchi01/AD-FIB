@@ -83,18 +83,19 @@ public class JakartaEE91Resource {
      boolean okRegister = true;
      
      LocalDate fechaActual = LocalDate.now();
-     DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-     String save_date = fechaActual.format(format);
-     LocalDate fechaCapt = LocalDate.parse(capt_date, format);
+     DateTimeFormatter format1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+     DateTimeFormatter format2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+     String save_date = fechaActual.format(format1);
+     LocalDate fechaCapt = LocalDate.parse(capt_date, format2);
+     String captura_date = fechaCapt.format(format1);
      
      // Validar que los campos requeridos no estén vacíos
      if (title == null || description == null || keywords == null || author == null || capt_date == null ||
             title.trim().isEmpty() || description.trim().isEmpty() || keywords.trim().isEmpty() || 
-            author.trim().isEmpty() || capt_date.trim().isEmpty() || !fechaCapt.isAfter(fechaActual)) 
+            author.trim().isEmpty() || capt_date.trim().isEmpty() || fechaCapt.isAfter(fechaActual)) 
          okRegister = false;
      else
-         okRegister = db.image_upload(title, description, keywords, author, creator, capt_date, save_date, title);
-     
+         okRegister = db.image_upload(title, description, keywords, author, creator, captura_date, save_date, title);
      if (okRegister)
          return Response.ok().build();
      else

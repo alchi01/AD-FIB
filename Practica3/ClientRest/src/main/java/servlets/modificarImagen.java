@@ -62,15 +62,6 @@ public class modificarImagen extends HttpServlet {
             return;
         }
 
-        int imagenId;
-        try {
-            imagenId = Integer.parseInt(imagenIdStr);
-        } catch (NumberFormatException e) {
-            request.setAttribute("TError", "ID de imagen inválido.");
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.forward(request, response);
-            return;
-        }
 
         // Preparar la solicitud al servidor REST
         String urlString = "http://localhost:8080/RestAD/resources/jakartaee9/images/" + imagenId; // Cambia esto a la URL correcta
@@ -82,14 +73,6 @@ public class modificarImagen extends HttpServlet {
             connection.setRequestMethod("PUT"); // Usar PUT para modificar
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
-
-            // Crear el cuerpo de la solicitud en formato JSON
-            JsonObject jsonInput = Json.createObjectBuilder()
-                    .add("title", titulo)
-                    .add("description", descripcion)
-                    .add("keywords", keywords)
-                    .add("imagen", imagen)
-                    .build();
 
             // Enviar la solicitud
             try (OutputStream os = connection.getOutputStream()) {
