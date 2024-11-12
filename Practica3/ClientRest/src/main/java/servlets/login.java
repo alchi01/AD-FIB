@@ -99,9 +99,9 @@ public class login extends HttpServlet {
             connection.setRequestMethod("POST");
             
             connection.setDoOutput(true);
-            String postData = "username=" + username + "&password=" + password;
+            String Data = "username=" + username + "&password=" + password;
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = postData.getBytes("utf-8");
+                byte[] input = Data.getBytes("utf-8");
                 os.write(input, 0, input.length);
             }
 

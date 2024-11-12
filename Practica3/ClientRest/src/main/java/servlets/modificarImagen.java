@@ -54,34 +54,34 @@ public class modificarImagen extends HttpServlet {
         String autor = request.getParameter("autor");
         String imagenIdStr = request.getParameter("imagenId");
 
-        // Preparar la solicitud al servidor REST
 
         try {
-            String urlString = "http://localhost:8080/RestAD/resources/jakartaee9/modify"; // Cambia esto a la URL correcta
+            String urlString = "http://localhost:8080/RestAD/resources/jakartaee9/modify"; 
             HttpURLConnection connection = null;
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST"); // Usar PUT para modificar
+            connection.setRequestMethod("POST"); 
             connection.setDoOutput(true);
             
-            String postData = "id=" + imagenIdStr + "&title=" + titulo + "&description=" + descripcion + "&keywords=" + keywords + "&author=" + autor + "&creator " + "&capt_date= ";  ;
+            String Data = "id=" + imagenIdStr + "&title=" + titulo + "&description=" + descripcion + "&keywords=" + keywords + "&author=" + autor + "&creator " + "&capt_date= ";  ;
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = Data.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
 
-
-            // Leer la respuesta
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 request.setAttribute("message", "Se ha modificado la imagen correctamente.");
                 RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
                 rd.forward(request, response);
             } else {
-                request.setAttribute("TError", "Error al modificar la imagen. Código de respuesta: " + responseCode);
+                request.setAttribute("TError", "image_error");
                 RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
                 rd.forward(request, response);
             }
             connection.disconnect();
         } catch (Exception e) {
-            // Manejo de excepciones
-            request.setAttribute("TError", "Error al procesar la solicitud: " + e.getMessage());
+            request.setAttribute("TError", "image_error");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
         } 

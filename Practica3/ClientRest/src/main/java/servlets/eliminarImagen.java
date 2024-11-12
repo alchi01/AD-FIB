@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import java.io.OutputStream;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -49,46 +50,37 @@ public class eliminarImagen extends HttpServlet {
         String imagenIdStr = request.getParameter("imagenId");
         String message;
 
-        int imagenId = Integer.parseInt(imagenIdStr);
-
-        // Construcción de la URL para la eliminación en el servidor remoto
-        String apiUrl = "http://localhost:8080/RestAD/resources/jakartaee9/eliminarImagen?id=" + imagenId;
-        HttpURLConnection connection = null;
 
         try {
+            String apiUrl = "http://localhost:8080/RestAD/resources/jakartaee9/delete";
+            HttpURLConnection connection = null;
+
             URL url = new URL(apiUrl);
             connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("DELETE");
-            connection.setRequestProperty("Accept", "application/json");
-
+            connection.setRequestMethod("POST");
+            
+            String postData = "id=" + imagenIdStr;
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = postData.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+            
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Procesar la respuesta JSON si es necesario
-                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                    String inputLine;
-                    StringBuilder responseString = new StringBuilder();
-                    while ((inputLine = in.readLine()) != null) {
-                        responseString.append(inputLine);
-                    }
-                    // Aquí puedes procesar la respuesta JSON si es necesario
-                    JsonObject jsonResponse = Json.createReader(new InputStreamReader(connection.getInputStream())).readObject();
-                    // Puedes manejar la respuesta JSON según sea necesario
-                    message = jsonResponse.getString("message", "Se ha eliminado la imagen correctamente");
-                }
+                request.setAttribute("message", "La imagen ha sido eliminada correctamente");
+                RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
+                rd.forward(request, response);
             } else {
-                message = "Error al eliminar la imagen en el servidor, código de respuesta: " + responseCode;
+                request.setAttribute("TError", "image_error");
+                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+                rd.forward(request, response);
             }
+            connection.disconnect();
         } catch (Exception e) {
-            message = "Error en la conexión: " + e.getMessage();
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-
-        request.setAttribute("message", message);
-        RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
-        rd.forward(request, response);
+                request.setAttribute("TError", "image_error");
+                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+                rd.forward(request, response);
+        } 
     }
 
     @Override

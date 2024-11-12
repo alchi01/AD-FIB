@@ -68,12 +68,28 @@ public class registrarImagen extends HttpServlet {
         
         
         //String uploadPath = UPLOAD_DIRECTORY + File.separator + fileName;
+        String contentType = filePart.getContentType();
+        String extensio;
+        if (!contentType.equals("image/jpeg") && !contentType.equals("image/png") && !contentType.equals("image/gif")) {
+            
+        }
 
+        switch (contentType) {
+            case "image/gif":
+                extensio = "gif";
+                break;
+            case "image/png":
+                extensio = "png";
+                break;
+            default:
+                extensio = "jpeg";
+                break;
+        }
 
 
         try {
-            //String uploadPath = getServletContext().getRealPath("") + File.separator + cont;
-            String uploadPath = System.getProperty("java.io.tmpdir") + File.separator + cont;
+            
+            String uploadPath = System.getProperty("java.io.tmpdir") + File.separator + cont + "." + extensio;
             System.out.println("Archivo guardado en: " + uploadPath);
             File file = new File(uploadPath);
             try (InputStream input = filePart.getInputStream()) {
@@ -92,7 +108,7 @@ public class registrarImagen extends HttpServlet {
             connection.setDoOutput(true);
 
             String postData = "title=" + titulo + "&description=" + descripcion + "&keywords=" + keywords +
-                              "&author=" + author + "&creator=" + user + "&capture=" + fechaCapt + "&filename=" + fileName;
+                              "&author=" + author + "&creator=" + user + "&capture=" + fechaCapt;
 
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = postData.getBytes("utf-8");
@@ -106,24 +122,24 @@ public class registrarImagen extends HttpServlet {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 ++cont;
                 request.setAttribute("message", "Se ha subido la imagen correctamente.");
-                //if (!response.isCommitted()) {
+                if (!response.isCommitted()) {
                     RequestDispatcher rd = request.getRequestDispatcher("submit.jsp");
                     rd.forward(request, response);
-                //}
+                }
             } else {
-                request.setAttribute("TError", "Error al subir la imagen. Código de respuesta: " + responseCode);
-                //if (!response.isCommitted()) {
+                request.setAttribute("TError", "image_error");
+                if (!response.isCommitted()) {
                     RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
                     rd.forward(request, response);
-                //}
+                }
             }
             connection.disconnect();
         } catch (Exception e) {
-            request.setAttribute("TError", "Error al procesar la solicitud: " + e.getMessage());
-            //if (!response.isCommitted()) {
+            request.setAttribute("TError", "image_error");
+            if (!response.isCommitted()) {
                 RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
                 rd.forward(request, response);
-            //}
+            }
         } 
     }
 
