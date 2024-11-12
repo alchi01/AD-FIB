@@ -51,34 +51,21 @@ public class modificarImagen extends HttpServlet {
         String titulo = request.getParameter("newTit");
         String descripcion = request.getParameter("newDesc");
         String keywords = request.getParameter("newKey");
-        String imagen = request.getParameter("newImg");
+        String autor = request.getParameter("autor");
         String imagenIdStr = request.getParameter("imagenId");
 
-        // Validar que los parámetros requeridos no sean nulos o vacíos
-        if (titulo == null || descripcion == null || keywords == null || imagen == null || imagenIdStr == null) {
-            request.setAttribute("TError", "Todos los campos son obligatorios.");
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.forward(request, response);
-            return;
-        }
-
-
         // Preparar la solicitud al servidor REST
-        String urlString = "http://localhost:8080/RestAD/resources/jakartaee9/images/" + imagenId; // Cambia esto a la URL correcta
-        HttpURLConnection connection = null;
 
         try {
+            String urlString = "http://localhost:8080/RestAD/resources/jakartaee9/modify"; // Cambia esto a la URL correcta
+            HttpURLConnection connection = null;
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("PUT"); // Usar PUT para modificar
-            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestMethod("POST"); // Usar PUT para modificar
             connection.setDoOutput(true);
+            
+            String postData = "id=" + imagenIdStr + "&title=" + titulo + "&description=" + descripcion + "&keywords=" + keywords + "&author=" + autor + "&creator " + "&capt_date= ";  ;
 
-            // Enviar la solicitud
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonInput.toString().getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
 
             // Leer la respuesta
             int responseCode = connection.getResponseCode();
@@ -91,16 +78,13 @@ public class modificarImagen extends HttpServlet {
                 RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
                 rd.forward(request, response);
             }
+            connection.disconnect();
         } catch (Exception e) {
             // Manejo de excepciones
             request.setAttribute("TError", "Error al procesar la solicitud: " + e.getMessage());
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
+        } 
     }
 
     @Override
