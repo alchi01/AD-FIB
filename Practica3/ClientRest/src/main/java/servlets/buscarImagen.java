@@ -88,53 +88,60 @@ public class buscarImagen extends HttpServlet {
 
         List<JsonObject> listaImagenes = new ArrayList<>();
         HttpURLConnection connection = null;
+        //BUsqueda por defecto, muestra todas las imagenes
         if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
             && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
             && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
         {
-            System.out.println("1");
+            
             searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/showImages";
         }
         else{
+            //Busqueda por titulo
             if (!buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
                 && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
                 && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
             {
-                System.out.println("2");
+                
                 searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle/"+ buscarTitulo;
             }
+            //Busqueda por ID
             else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
                 && !buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
                 && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
             {
-                System.out.println("3");
+                
                 int id = Integer.parseInt(buscarId);
                 searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchID/" + id;
             }
+            //Busqueda por autor
             else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
                 && buscarId.trim().isEmpty() && !buscarAuthor.trim().isEmpty()
                 && buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
             {
-                System.out.println("4");            
+                        
                 searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchAuthor/"+ buscarAuthor;
 
             }
+            //Busqueda por Date
             else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
                 && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
                 && !buscarDate.trim().isEmpty() && buscarKeywords.trim().isEmpty())
             {
-                System.out.println("5");
+                
                 searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchCreationDate/"+ buscarDate;
             }
+            //Busqueda por Keywords
             else if (buscarTitulo.trim().isEmpty() && buscarDescripcion.trim().isEmpty() 
                 && buscarId.trim().isEmpty() && buscarAuthor.trim().isEmpty()
                 && buscarDate.trim().isEmpty() && !buscarKeywords.trim().isEmpty())
             {
-                System.out.println("6");            
+                        
                 searchUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/searchTitle/"+ buscarKeywords;
             }
+            //Busqueda por combinacion
             else{
-                System.out.println("7");           
+                          
                 StringBuilder searchUrlComb = new StringBuilder("http://localhost:8080/ServerRest/resources/jakartaee9/searchCombined?");
 
                 
@@ -165,8 +172,7 @@ public class buscarImagen extends HttpServlet {
 
         try {
             // Construcción de la URL para la búsqueda en el servidor remoto
-            
-
+     
             URL url = new URL(searchUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -174,12 +180,12 @@ public class buscarImagen extends HttpServlet {
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                System.out.println("8");           
+                          
 
                 // Procesamiento de la respuesta JSON del servidor
                 try (JsonReader jsonReader = Json.createReader(new InputStreamReader(connection.getInputStream()))) {
                     JsonArray jsonArray = jsonReader.readArray();
-                    System.out.println("9");           
+                              
 
                     // Iteración de cada objeto JSON y almacenamiento en la lista de imágenes
                     for (int i = 0; i < jsonArray.size(); i++) {
@@ -187,7 +193,7 @@ public class buscarImagen extends HttpServlet {
                         
                         // Solo añadir las imágenes del usuario actual
                         if (jsonImage.getString("creator").equals(user)) {
-                            System.out.println("11");  
+                              
                             listaImagenes.add(jsonImage);
                         }
                     }
@@ -201,8 +207,7 @@ public class buscarImagen extends HttpServlet {
             }
             connection.disconnect();
         } catch (Exception e) {
-            // Error en la conexión HTTP o en el procesamiento de JSON
-            System.out.println("10");           
+            // Error en la conexión HTTP o en el procesamiento de JSON          
             request.setAttribute("TError", "image_error");
             RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
             rd.forward(request, response);

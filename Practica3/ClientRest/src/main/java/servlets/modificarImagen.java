@@ -53,7 +53,8 @@ public class modificarImagen extends HttpServlet {
         String keywords = request.getParameter("newKey");
         String autor = request.getParameter("autor");
         String imagenIdStr = request.getParameter("imagenId");
-
+        HttpSession session = request.getSession(false);
+        String user = (String) session.getAttribute("user");
 
         try {
             String urlString = "http://localhost:8080/ServerRest/resources/jakartaee9/modify"; 
@@ -63,7 +64,7 @@ public class modificarImagen extends HttpServlet {
             connection.setRequestMethod("POST"); 
             connection.setDoOutput(true);
             
-            String Data = "id=" + imagenIdStr + "&title=" + titulo + "&description=" + descripcion + "&keywords=" + keywords + "&author=" + autor + "&creator " + "&capt_date= ";  ;
+            String Data = "id=" + imagenIdStr + "&title=" + titulo + "&description=" + descripcion + "&keywords=" + keywords + "&author=" + autor + "&creator=" + user + "&capt_date= ";  ;
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = Data.getBytes("utf-8");
                 os.write(input, 0, input.length);

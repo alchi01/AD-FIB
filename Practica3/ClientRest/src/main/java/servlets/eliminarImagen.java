@@ -49,7 +49,8 @@ public class eliminarImagen extends HttpServlet {
             throws ServletException, IOException {
         String imagenIdStr = request.getParameter("imagenId");
         String message;
-
+        HttpSession session = request.getSession(false);
+        String user = (String) session.getAttribute("user");
         
         try {
             
@@ -60,7 +61,7 @@ public class eliminarImagen extends HttpServlet {
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             
-            String postData = "id=" + imagenIdStr;
+            String postData = "id=" + imagenIdStr + "&creator=" + user;
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = postData.getBytes("utf-8");
                 os.write(input, 0, input.length);

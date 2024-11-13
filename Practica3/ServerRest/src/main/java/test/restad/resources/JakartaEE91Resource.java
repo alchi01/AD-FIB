@@ -60,6 +60,27 @@ public class JakartaEE91Resource {
      else  
          return Response.status(Response.Status.UNAUTHORIZED).build();
  }
+ 
+ /**
+ * POST method to check the user is the creator of an image
+ * @param username
+ * @param id
+ * @return
+ */
+ /*@Path("checkUser")
+ @POST
+ @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+ @Produces(MediaType.APPLICATION_JSON)
+ public Response checkUserConnected(@FormParam("id") String id,
+                           @FormParam("username") String username){
+     
+     database db = new database();
+     
+     if (db.creator_connected(Integer.parseInt(id),username)) 
+          return Response.ok().build();
+     else  
+         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+ }*/
  /**
  * POST method to register a new image – File is not uploaded
  * @param title
@@ -128,8 +149,9 @@ public class JakartaEE91Resource {
                               @FormParam("creator") String creator,
                               @FormParam("capture") String capt_date) {
      database db = new database();
-     
-     boolean okMod  = db.image_modify(title, description, keywords, author, Integer.parseInt(id));
+     boolean okMod = false;
+     if (db.creator_connected(Integer.parseInt(id), creator))
+        okMod  = db.image_modify(title, description, keywords, author, Integer.parseInt(id));
      
      if (okMod) 
          return Response.ok().build();
@@ -140,17 +162,21 @@ public class JakartaEE91Resource {
  /**
  * POST method to delete an existing image
  * @param id
+ * @param creator
  * @return
  */
  @Path("delete")
  @POST
  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
  @Produces(MediaType.APPLICATION_JSON)
- public Response deleteImage (@FormParam("id") String id) {
+ public Response deleteImage (@FormParam("id") String id,
+                        @FormParam("creator") String creator) {
      database db = new database();
-     
+     boolean okDelete = false;
      System.out.println(id);
-     boolean okDelete = db.eliminate(Integer.parseInt(id));
+     if (db.creator_connected(Integer.parseInt(id), creator))
+        okDelete = db.eliminate(Integer.parseInt(id));
+     
      
      if (okDelete)
          return Response.ok().build();

@@ -83,6 +83,38 @@ public class database {
         return isAuth;
     }
     
+    public boolean creator_connected(int id, String user){
+        boolean isUser = false;
+        String creator = null;
+        Connection connection = null;
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr2;user=pr2;password=pr2");
+                
+            String sql = "SELECT * FROM IMAGE WHERE ID = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            
+            ResultSet resultSet = statement.executeQuery();
+             if (resultSet.next()) {
+                 creator = resultSet.getString("CREATOR");
+             }
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+        isUser = user.equals(creator);
+        return isUser;
+
+    }
+    
     public boolean image_upload(String titulo,String description,String keywords, String author,String user, String fechaCapt,String fechaGuard,String fileName) {
         boolean okImage = false;
         
