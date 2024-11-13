@@ -48,19 +48,20 @@
                 <p align="center">Title: ${filaImagen.title}</p>
                 <p>Description: ${filaImagen.description}</p>
                 <img src="${filaImagen.filename}" width="200" height="200">
-
+                <p>ID: ${filaImagen.description};   Autor: ${filaImagen.author};   Fecha de Creacion: ${filaImagen.captureDate};  Keywords: ${filaImagen.keywords};</p>
+                
                 <form action="modificarImagen.jsp" method="GET">
                     <input type="hidden" name="imagenId" value=${filaImagen.id} /> 
-                    <input type="hidden" name="imagenTitle" value=${filaImagen.title} /> 
-                   <!-- <input type="hidden" name="imagenFile" value="${filaImagen.urlImage}" /> -->
+                  <!--  <input type="hidden" name="imagenTitle" value=${filaImagen.title} /> 
+                    <input type="hidden" name="imagenFile" value="${filaImagen.urlImage}" /> -->
                     <button type="submit">Modificar imagen</button>
                 </form>
 
 
                 <form action="eliminarImagen.jsp" method="GET">
-                    <input type="hidden" name="imagenId" value=${filaImagen.id} /> <!-- ID de la imagen -->
-                    <input type="hidden" name="imagenTitle" value=${filaImagen.title} /> <!-- TITLE de la imagen 
-                    <input type="hidden" name="imagenFile" value="${filaImagen.urlImage}" /> <!-- FILE de la imagen -->
+                    <input type="hidden" name="imagenId" value=${filaImagen.id} /> 
+                    <input type="hidden" name="imagenTitle" value=${filaImagen.title} /> 
+                    <!-- <input type="hidden" name="imagenFile" value="${filaImagen.urlImage}" /> <!-- FILE de la imagen -->
                     <button type="submit">Eliminar imagen</button>
                 </form>
             </div>
