@@ -21,7 +21,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import jakarta.servlet.http.HttpSession;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.io.File;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.multipart.file.StreamDataBodyPart;
 
 /**
  *
@@ -61,20 +70,20 @@ public class registrarImagen extends HttpServlet {
         String keywords = request.getParameter("Keywords");
         String author = request.getParameter("Autor");
         String fechaCapt = request.getParameter("Fecha de creacion");
-        Part filePart = request.getPart("Subir Imagen");
+        Part filep = request.getPart("Subir Imagen");
         HttpSession session = request.getSession();
         String user = (String) session.getAttribute("user");
-        String fileName = filePart.getSubmittedFileName();
+        String fileName = filep.getSubmittedFileName();
         
         
         //String uploadPath = UPLOAD_DIRECTORY + File.separator + fileName;
-        String contentType = filePart.getContentType();
+        String contentType = filep.getContentType();
         String extensio;
         if (!contentType.equals("image/jpeg") && !contentType.equals("image/png") && !contentType.equals("image/gif")) {
             
         }
 
-        switch (contentType) {
+        /*switch (contentType) {
             case "image/gif":
                 extensio = "gif";
                 break;
@@ -84,12 +93,12 @@ public class registrarImagen extends HttpServlet {
             default:
                 extensio = "jpeg";
                 break;
-        }
+        }*/
 
 
         try {
             
-            String uploadPath = System.getProperty("java.io.tmpdir") + File.separator + cont + "." + extensio;
+            /*String uploadPath = System.getProperty("java.io.tmpdir") + File.separator + cont + "." + extensio;
             System.out.println("Archivo guardado en: " + uploadPath);
             File file = new File(uploadPath);
             try (InputStream input = filePart.getInputStream()) {
@@ -99,7 +108,7 @@ public class registrarImagen extends HttpServlet {
                 request.setAttribute("TError", "image_error");
                 RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
                 rd.forward(request, response);
-            }
+            }*/
             String apiUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/register";
             URL url = new URL(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -107,19 +116,37 @@ public class registrarImagen extends HttpServlet {
             
             connection.setDoOutput(true);
 
-            String postData = "title=" + titulo + "&description=" + descripcion + "&keywords=" + keywords +
+            /*String postData = "title=" + titulo + "&description=" + descripcion + "&keywords=" + keywords +
                               "&author=" + author + "&creator=" + user + "&capture=" + fechaCapt;
 
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = postData.getBytes("utf-8");
                 os.write(input, 0, input.length);
 
-            }
+            }*/
+            
+            final Client client = ClientBuilder.newBuilder().register(MultiPartFeature.class).build();
+                StreamDataBodyPart filePart = new StreamDataBodyPart("file", filep.getInputStream());
+                FormDataMultiPart formDataMultiPart = new FormDataMultiPart();
+                final FormDataMultiPart multipart = (FormDataMultiPart) formDataMultiPart
+                        .field("title", titulo, MediaType.TEXT_PLAIN_TYPE)
+                        .field("description", descripcion, MediaType.TEXT_PLAIN_TYPE)
+                        .field("keywords", keywords, MediaType.TEXT_PLAIN_TYPE)
+                        .field("author", author, MediaType.TEXT_PLAIN_TYPE)
+                        .field("creator", user, MediaType.TEXT_PLAIN_TYPE)
+                        .field("capture", fechaCapt, MediaType.TEXT_PLAIN_TYPE)
+                        .field("filename",fileName, MediaType.TEXT_PLAIN_TYPE)
+                        .bodyPart(filePart);
+
+                final WebTarget target = client.target(apiUrl);
+                final Response responseCode = target.request().post(Entity.entity(multipart, multipart.getMediaType()));
+                
+                formDataMultiPart.close();
+                multipart.close();
             
 
             // Leer la respuesta del servidor
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
+            if (responseCode.getStatus() == 201) {
                 ++cont;
                 request.setAttribute("message", "Se ha subido la imagen correctamente.");
                 if (!response.isCommitted()) {
@@ -134,7 +161,7 @@ public class registrarImagen extends HttpServlet {
                 }
             }
             connection.disconnect();
-        } catch (Exception e) {
+        } catch (ServletException | IOException e) {
             request.setAttribute("TError", "image_error");
             if (!response.isCommitted()) {
                 RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");

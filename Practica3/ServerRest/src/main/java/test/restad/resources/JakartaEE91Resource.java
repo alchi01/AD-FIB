@@ -14,13 +14,20 @@ import jakarta.ws.rs.core.Response;
 
 //Añadidos
 import DB.database;
+import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
-import java.sql.SQLException;
+import jakarta.ws.rs.core.HttpHeaders;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 /**
  *
@@ -35,6 +42,8 @@ public class JakartaEE91Resource {
                 .ok("ping Jakarta EE")
                 .build();
     }
+    
+    final public static String uploadDir = "/var/webapp/images/";
     
     /**
  * OPERACIONES DEL SERVICIO REST
@@ -81,6 +90,34 @@ public class JakartaEE91Resource {
      else  
          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
  }*/
+ 
+ private static void makeDirIfNotExists() {
+        File dir = new File(uploadDir);
+        // Creamos directorio si no existe.
+        if (! dir.exists() ) {
+           dir.mkdirs();
+        }
+    }
+ 
+ public static Boolean writeImage(String file_name, InputStream fileInputStream)  {
+        try{
+            makeDirIfNotExists();
+            File targetfile = new File(uploadDir + file_name);
+        
+            java.nio.file.Files.copy(
+                    fileInputStream,
+                    targetfile.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING
+            );  
+        }catch (IOException e){
+            return false;
+        }
+        return true; 
+    }
+    
+    
+ 
+ 
  /**
  * POST method to register a new image – File is not uploaded
  * @param title
@@ -89,19 +126,33 @@ public class JakartaEE91Resource {
  * @param author
  * @param creator
  * @param capt_date
+ * @param filename
+ * @param fileInputStream
+ * @param fileMetaData
  * @return
  */
  @Path("register")
  @POST
- @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+ @Consumes(MediaType.MULTIPART_FORM_DATA)
  @Produces(MediaType.APPLICATION_JSON)
- public Response registerImage (@FormParam("title") String title,
-                                @FormParam("description") String description,
-                                @FormParam("keywords") String keywords,
-                                @FormParam("author") String author,
-                                @FormParam("creator") String creator,
-                                @FormParam("capture") String capt_date) {
-     
+ public Response registerImage (@FormDataParam("title") String title,
+                                @FormDataParam("description") String description,
+                                @FormDataParam("keywords") String keywords,
+                                @FormDataParam("author") String author,
+                                @FormDataParam("creator") String creator,
+                                @FormDataParam("capture") String capt_date,
+                                @FormDataParam("filename") String filename,
+                                @FormDataParam("file") InputStream fileInputStream,
+                                @FormDataParam("file") FormDataContentDisposition fileMetaData) {               
+        /*if (!writeImage(filename, fileInputStream)) { //no sha pogut guardar la imatge            
+            StatusCode = 500; //fallada server
+            //String ErrorName = "general";
+        }
+        
+        /*return Response
+            .status(StatusCode)
+            .build();*/
+        
      database db = new database();
      boolean okRegister = true;
      
@@ -118,11 +169,12 @@ public class JakartaEE91Resource {
             author.trim().isEmpty() || capt_date.trim().isEmpty() || fechaCapt.isAfter(fechaActual)) 
          okRegister = false;
      else
-         okRegister = db.image_upload(title, description, keywords, author, creator, captura_date, save_date, title);
+         okRegister = db.image_upload(title, description, keywords, author, creator, captura_date, save_date, filename)
+         && writeImage(filename, fileInputStream);
      if (okRegister)
-         return Response.ok().build();
+         return Response.status(201).build();
      else
-         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+         return Response.status(500).build();
          
      
  }
@@ -159,6 +211,21 @@ public class JakartaEE91Resource {
          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
      
  }
+ 
+ public static Boolean deleteImage(String file_name) 
+    {
+        makeDirIfNotExists();
+        
+        File targetfile = new File(uploadDir + file_name);
+        if(! targetfile.delete()) {
+            System.out.println("ERROR: Failed to delete " + targetfile.getAbsolutePath());
+            return false;
+        }
+       
+        System.out.println("SUCCESS: deleted " + targetfile.getAbsolutePath());
+        return true;
+    }
+ 
  /**
  * POST method to delete an existing image
  * @param id
@@ -174,8 +241,10 @@ public class JakartaEE91Resource {
      database db = new database();
      boolean okDelete = false;
      System.out.println(id);
-     if (db.creator_connected(Integer.parseInt(id), creator))
-        okDelete = db.eliminate(Integer.parseInt(id));
+     if (db.creator_connected(Integer.parseInt(id), creator)) {
+        String filename = db.consulta_imagen(Integer.parseInt(id));
+        okDelete = db.eliminate(Integer.parseInt(id)) && deleteImage(filename);
+     }
      
      
      if (okDelete)
@@ -322,4 +391,19 @@ public class JakartaEE91Resource {
          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 
  }
+ 
+  @Path("getImage/{filename}")
+    @GET
+    @Produces("image/*")
+    public Response getImage(@PathParam("filename") String filename) {
+        try {
+            File f = new File(uploadDir + filename);
+            if (!f.exists()) return Response.status(Response.Status.FORBIDDEN).build();
+            String mt = new MimetypesFileTypeMap().getContentType(f);
+            return Response.ok(f, mt).header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+filename).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
+
