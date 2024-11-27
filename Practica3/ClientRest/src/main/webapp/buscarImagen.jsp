@@ -47,7 +47,7 @@
             <div align="center">
                 <p align="center">Title: ${filaImagen.title}</p>
                 <p>Description: ${filaImagen.description}</p>
-                <img src="${filaImagen.filename}" width="200" height="200">
+                <img src=${filaImagen.filename} width="200" height="200">
                 <p>ID: ${filaImagen.description};   Autor: ${filaImagen.author};   Fecha de Creacion: ${filaImagen.captureDate};  Keywords: ${filaImagen.keywords};</p>
                 
                 <form action="modificarImagen.jsp" method="GET">

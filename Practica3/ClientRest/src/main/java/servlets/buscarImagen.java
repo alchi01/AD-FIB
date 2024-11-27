@@ -24,6 +24,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileOutputStream;
 
 /**
  *
@@ -179,9 +181,7 @@ public class buscarImagen extends HttpServlet {
             connection.setDoOutput(true);
 
             int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                          
-
+            if (responseCode == HttpURLConnection.HTTP_OK) {                                         
                 // Procesamiento de la respuesta JSON del servidor
                 try (JsonReader jsonReader = Json.createReader(new InputStreamReader(connection.getInputStream()))) {
                     JsonArray jsonArray = jsonReader.readArray();
@@ -190,15 +190,24 @@ public class buscarImagen extends HttpServlet {
                     // Iteración de cada objeto JSON y almacenamiento en la lista de imágenes
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject jsonImage = jsonArray.getJsonObject(i);
-                        
+                          System.out.println("ENTRO");
                         // Solo añadir las imágenes del usuario actual
                         if (jsonImage.getString("creator").equals(user)) {
-                              
-                            listaImagenes.add(jsonImage);
+                            String filename = jsonImage.getString("filename");
+                           
+                            File tempImageFile = descargarImagenDesdeRest(filename);
+
+                            // Si necesitas usar una URL accesible desde el cliente (por ejemplo, en el navegador)
+                            if (tempImageFile != null) {
+                                 System.out.println("ENTRO2");
+                  
+                                listaImagenes.add(jsonImage);
+                            }
                         }
                     }
                 }
-            } else {
+            }else {
+                System.out.println("ENTRO1");
                 // Error de conexión, redirigir a una página de error
                 request.setAttribute("TError", "image_error");
                 RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
@@ -207,6 +216,7 @@ public class buscarImagen extends HttpServlet {
             }
             connection.disconnect();
         } catch (Exception e) {
+            System.out.println("ENTRO2");
             // Error en la conexión HTTP o en el procesamiento de JSON          
             request.setAttribute("TError", "image_error");
             RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
@@ -243,5 +253,50 @@ public class buscarImagen extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+    
+    private File descargarImagenDesdeRest(String filename) throws IOException {
+        
+        String fileUrl = "http://localhost:8080/ServerRest/resources/jakartaee9/getImage/" + filename;
+
+        URL url = new URL(fileUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        System.out.println("ENTRO1");
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            
+            System.out.println("ENTRO3");
+
+            // Obtener la ruta del directorio tmp en el servidor web
+            String tmpDirPath = getServletContext().getRealPath("");
+
+            // Crear la carpeta tmp si no existe
+            File tmpDir = new File(tmpDirPath);
+            if (!tmpDir.exists()) {
+                tmpDir.mkdirs();  // Si no existe, la creamos
+            }
+
+            // Crear el archivo en el directorio tmp con el nombre original
+            File tempFile = new File(tmpDir, filename);
+
+            // Descargar el archivo de la URL y guardarlo en el archivo local
+            try (var inputStream = connection.getInputStream();
+                 var outputStream = new FileOutputStream(tempFile)) {
+
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+            System.out.println(tempFile.getAbsolutePath());
+            // Retornamos el archivo descargado
+            return tempFile;
+        }
+
+        // Si la conexión no fue exitosa, desconectamos y retornamos null
+        connection.disconnect();
+        return null;
+    }
 
 }
