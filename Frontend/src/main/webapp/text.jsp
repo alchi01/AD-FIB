@@ -15,6 +15,7 @@
     </head>
     <body>
         <h1> Editor Markdown </h1>
+        
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 var easyMDE = new EasyMDE({ 
@@ -27,9 +28,12 @@
                         delay: 1000,
                     },
                 });
+                document.getElementById("markdownForm").addEventListener("submit", function () {
+                document.getElementById("markdown-editor").value = easyMDE.value();
+                });
             });
         </script>
-        <form action="procesarMarkdown" method="post">
+        <form id="markdownForm" action="text" method="post">
             <textarea id="markdown-editor" name="markdownContent"></textarea>
             <button type="submit">Enviar</button>
         </form>
