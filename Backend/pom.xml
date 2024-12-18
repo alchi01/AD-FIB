@@ -27,6 +27,11 @@
             <artifactId>commonmark</artifactId>
             <version>0.21.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>html2pdf</artifactId>
+            <version>4.0.4</version> <!-- Verifica la última versión disponible -->
+        </dependency>
     </dependencies>
     
     <build>

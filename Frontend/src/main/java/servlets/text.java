@@ -79,13 +79,19 @@ public class text extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String markdownContent = request.getParameter("markdownContent");
+        String format = request.getParameter("exportFormat");
+        
+        System.out.println();
         
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("markdownContent", markdownContent);
         JsonObject json = builder.build();
 
         
-        String apiUrl = "http://localhost:8080/Backend/resources/jakartaee9/downloadhtml";
+        String apiUrl = "http://localhost:8080/Backend/resources/jakartaee9/";
+        
+        if (format.equals("pdf")) apiUrl += "downloadpdf";
+        else if (format.equals("html")) apiUrl += "downloadhtml";
         
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -101,9 +107,15 @@ public class text extends HttpServlet {
         }
         int responseCode = connection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
+            if (format.equals("pdf")) {
+                response.setContentType("application/pdf");
+                response.setHeader("Content-Disposition", "attachment; filename=documento.pdf");
+            }
+            else if (format.equals("html")) {
+                response.setContentType("text/html");
+                response.setHeader("Content-Disposition", "attachment; filename=documento.html");
+            }
             InputStream inputStream = connection.getInputStream();
-            response.setContentType("text/html");
-            response.setHeader("Content-Disposition", "attachment; filename=documento.html");
             OutputStream outputStream = response.getOutputStream();
 
             byte[] buffer = new byte[1024];

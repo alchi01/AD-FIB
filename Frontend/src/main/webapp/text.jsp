@@ -20,7 +20,7 @@
             <form id="markdownForm" action="text" method="post">
                 <textarea id="markdown-editor" name="markdownContent"></textarea>
                 <div class="form-footer">
-                    <select id="exportFormat" name="exportFormat" class="export-button">
+                    <select id="exportFormat" name="exportFormat" class="export-button" class="export-button" onchange="submitForm()">
                         <option value="" disabled selected>Exportar</option>
                         <option value="html">HTML</option>
                         <option value="pdf">PDF</option>
@@ -28,6 +28,12 @@
                 </div>
             </form>
         </div>
+        <script>
+            function submitForm() {
+                const form = document.getElementById("markdownForm");
+                form.submit(); // Enviar el formulario al servlet
+            }
+        </script>
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {
