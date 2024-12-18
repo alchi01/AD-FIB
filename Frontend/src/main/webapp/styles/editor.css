@@ -1,0 +1,110 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 18 dic 2024, 18:18:07
+    Author     : alumne
+*/
+
+.editor-container {
+    width: 80%;
+    margin: 20px auto;
+    background-color: #f9f9f9; /* Light gray background */
+    border: 1px solid #ddd; /* Soft border */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+/* Header Styling */
+.editor-container h1 {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Toolbar Styling */
+.toolbar {
+    display: flex;
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    border-radius: 8px 8px 0 0;
+}
+
+.toolbar button {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    color: #333;
+    padding: 8px 12px;
+    margin-right: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toolbar button:hover {
+    background-color: #e0e0e0;
+}
+
+ /* Contenedor del desplegable y botón */
+.form-footer {
+    text-align: right;
+    margin-top: 10px;
+    margin-bottom: 20px; /* Añade margen inferior */
+}
+
+/* Botón desplegable personalizado */
+#exportFormat {
+    appearance: none; /* Elimina el estilo por defecto */
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 5px;
+    position: relative;
+}
+
+/* Indicador de triángulo hacia abajo */
+#exportFormat::after {
+    content: "▼"; /* Triángulo hacia abajo */
+    position: absolute;
+    right: 10px; /* Posición a la derecha */
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    pointer-events: none; /* Evita interferencias con el clic */
+}
+
+/* Efecto hover gris suave */
+#exportFormat:hover {
+    background-color: rgba(108, 117, 125, 0.2); /* Gris suave con transparencia */
+    color: #333;
+}
+
+/* Estilo del botón enviar */
+.export-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.export-button:hover {
+    background-color: rgba(108, 117, 125, 0.2); /* Gris suave */
+    color: #333;
+}
+
+
+
