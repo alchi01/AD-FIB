@@ -11,6 +11,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import org.commonmark.node.Node;
@@ -50,7 +52,7 @@ public class JakartaEE91Resource {
         System.out.println(markdownContent);
         String htmlResponse = convertirMarkdownAHtml(markdownContent);
         System.out.println(htmlResponse);
-        byte[] archivoHtml = htmlResponse.getBytes(StandardCharsets.UTF_8);
+        InputStream archivoHtml = new ByteArrayInputStream(htmlResponse.getBytes());
         return Response.ok(archivoHtml)
                 .header("Content-Disposition", "attachment; filename=documento.html") 
                 .type("text/html").build();

@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import java.io.InputStream;
 
 /**
  *
@@ -99,7 +100,18 @@ public class text extends HttpServlet {
             os.flush();
         }
         int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) System.out.println("BIEEEEEN");
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            InputStream inputStream = connection.getInputStream();
+            response.setContentType("text/html");
+            response.setHeader("Content-Disposition", "attachment; filename=documento.html");
+            OutputStream outputStream = response.getOutputStream();
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
         else System.out.println("MAAAAL");
         connection.disconnect();
     }
