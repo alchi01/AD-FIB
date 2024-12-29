@@ -106,5 +106,44 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     color: #333;
 }
 
+/* Contenedor para los botones de la esquina superior derecha */
+.top-buttons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px; /* Espacio entre botones */
+}
 
+/* Estilo general para los botones */
+.top-buttons a {
+    text-decoration: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Estilo para el botón de Log In */
+.top-buttons .login-btn {
+    background-color: #007bff; /* Azul para Log In */
+}
+
+.top-buttons .login-btn:hover {
+    background-color: #0056b3; /* Azul más oscuro */
+}
+
+/* Estilo para el botón de Sign Up */
+.top-buttons .signup-btn {
+    background-color: rgba(108, 117, 125, 0.2); /* Gris semitransparente */
+    color: #333; /* Texto gris */
+}
+
+.top-buttons .signup-btn:hover {
+    background-color: rgba(108, 117, 125, 0.4); /* Gris más oscuro */
+}
 

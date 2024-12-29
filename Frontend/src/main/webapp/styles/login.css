@@ -1,0 +1,130 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 29 dic 2024, 17:21:22
+    Author     : alumne
+*/
+
+.login-container {
+    width: 80%;
+    max-width: 400px;
+    margin: 50px auto;
+    background-color: #f9f9f9; /* Light gray background */
+    border: 1px solid #ddd; /* Soft border */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.login-container h2 {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.login-container .remember-me {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #555;
+}
+
+.login-container .remember-me input {
+    margin-right: 10px;
+}
+
+.login-container .login-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-container .login-btn:hover {
+    background-color: rgba(108, 117, 125, 0.2); /* Gris suave */
+    color: #333;
+}
+
+.login-container .divider {
+    margin: 15px 0;
+    font-size: 14px;
+    color: #999;
+    text-align: center;
+}
+
+.login-container .google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-container .google-btn img {
+    width: 20px;
+    margin-right: 10px;
+}
+
+.login-container .google-btn:hover {
+    background-color: rgba(108, 117, 125, 0.2);
+}
+
+.login-container .manual-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px; /* Margen superior */
+    transition: background-color 0.3s ease;
+}
+
+.login-container .manual-btn:hover {
+    background-color: rgba(108, 117, 125, 0.2); /* Gris suave */
+    color: #333;
+}
+
+.login-container .forgot-password {
+    display: block;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #007bff;
+    text-align: center;
+    text-decoration: none;
+}
+
+.login-container .forgot-password:hover {
+    text-decoration: underline;
+}
