@@ -88,7 +88,12 @@ public class text extends HttpServlet {
         String markdownContent = request.getParameter("markdownContent");
          HttpSession session = request.getSession(false);
         String user = (session != null) ? (String) session.getAttribute("user") : null;
-        System.out.println(user);
+        if (user == null && action != null){
+            request.setAttribute("TError", "register_error_session");
+            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+            rd.forward(request, response);
+            return;
+        }
 
         if ("guardar".equals(action)) {
             // Crear la cadena de parámetros en formato "application/x-www-form-urlencoded"
@@ -114,11 +119,14 @@ public class text extends HttpServlet {
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                response.setContentType("text/plain");
-                response.getWriter().write("Contenido guardado exitosamente.");
+                request.setAttribute("TError", "save_success");
+                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+                rd.forward(request, response);
             } else {
-                response.setStatus(responseCode);
-                response.getWriter().write("Error al guardar el contenido.");
+                request.setAttribute("TError", "register_error_save");
+                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+                rd.forward(request, response);
+                return;
             }
 
             connection.disconnect();
@@ -161,7 +169,10 @@ public class text extends HttpServlet {
                 RequestDispatcher dispatcher = request.getRequestDispatcher("text.jsp");
                 dispatcher.forward(request, response);
             } else {
-                response.getWriter().write("Error al cargar el contenido.");
+                request.setAttribute("TError", "register_error_load");
+                RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
+                rd.forward(request, response);
+                return;
             }
 
             connection.disconnect();
