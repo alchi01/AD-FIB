@@ -76,14 +76,9 @@ public class login extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("User");
-        String password = request.getParameter("Password");
-        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-            request.setAttribute("TError", "login_error");
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.forward(request, response);
-            return;
-        }
+        String username = request.getParameter("user");
+        String password = request.getParameter("password");
+
 
         // Construcción de la URL para la autenticación en el servidor remoto
         
@@ -111,6 +106,7 @@ public class login extends HttpServlet {
                 request.setAttribute("TError", "login_error");
                 RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
                 rd.forward(request, response);
+                return;
             }
             connection.disconnect();
         } catch (Exception e) {

@@ -17,7 +17,7 @@
     <body>
         <div class="signup-container">
             <h2>Sign Up</h2>
-            <form action="procesar_registro.jsp" method="post">
+            <form action="register" method="post">
                 <input type="email" id="email" name="email" placeholder="Email Address" required>
                 <input type="text" id="username" name="username" placeholder="Username" required>
                 <input type="password" id="password" name="password" placeholder="Password" required>

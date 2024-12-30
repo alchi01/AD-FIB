@@ -78,10 +78,13 @@ public class register extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-                String username = request.getParameter("User");
-        String password = request.getParameter("Password");
-        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-            request.setAttribute("TError", "login_error");
+        String email = request.getParameter("email");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String confirmPass = request.getParameter("confirm-password");
+        
+        if (!confirmPass.equals("password")) {
+            request.setAttribute("TError", "register_error_password");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
             return;
@@ -94,7 +97,7 @@ public class register extends HttpServlet {
             connection.setRequestMethod("POST");
             
             connection.setDoOutput(true);
-            String Data = "username=" + username + "&password=" + password;
+            String Data = "username=" + username + "&email=" + email + "&password=" + password;
             try (OutputStream os = connection.getOutputStream()) {
                 byte[] input = Data.getBytes("utf-8");
                 os.write(input, 0, input.length);
@@ -107,13 +110,14 @@ public class register extends HttpServlet {
                 session.setAttribute("user", username);
                 response.sendRedirect("text.jsp");
             } else {
-                request.setAttribute("TError", "login_error");
+                request.setAttribute("TError", "register_error");
                 RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
                 rd.forward(request, response);
+                return;
             }
             connection.disconnect();
         } catch (Exception e) {
-            request.setAttribute("TError", "login_error");
+            request.setAttribute("TError", "register_error");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
         }
