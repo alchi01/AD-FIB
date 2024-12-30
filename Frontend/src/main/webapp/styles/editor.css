@@ -26,7 +26,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     border-bottom: 1px solid #ddd;
 }
 
-/* Toolbar Styling */
+/* Toolbar Styling 
 .toolbar {
     display: flex;
     background-color: #f1f1f1;
@@ -48,7 +48,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
 .toolbar button:hover {
     background-color: #e0e0e0;
-}
+}*/
 
  /* Contenedor del desplegable y botón */
 .form-footer {
@@ -79,7 +79,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     right: 10px; /* Posición a la derecha */
     top: 50%;
     transform: translateY(-50%);
-    color: white;
+    color: black;
     pointer-events: none; /* Evita interferencias con el clic */
 }
 
@@ -106,44 +106,54 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     color: #333;
 }
 
-/* Contenedor para los botones de la esquina superior derecha */
 .top-buttons {
-    position: absolute;
-    top: 10px;
-    right: 10px;
     display: flex;
+    justify-content: flex-end; /* Alinea los botones a la derecha */
     gap: 10px; /* Espacio entre botones */
+    align-items: center; /* Asegura que no se estiren */
+    margin-top: 10px;
 }
 
-/* Estilo general para los botones */
-.top-buttons a {
-    text-decoration: none;
+.login-menu-btn, .signup-menu-btn {
     padding: 10px 20px;
-    font-size: 14px;
-    font-weight: bold;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: auto; /* Ajusta al contenido */
+    max-width: 200px; /* Opcional: límite razonable */
+}
+
+.login-menu-btn:hover {
+    background-color: #0056b3; /* Azul más oscuro */
+}
+
+.signup-menu-btn {
+    background-color: rgba(108, 117, 125, 0.2);
+    color: #333;
+}
+
+.signup-menu-btn:hover {
+    background-color: rgba(108, 117, 125, 0.4);
+}
+
+.save-btn {
+    position: fixed; /* Posiciona el botón de forma fija en la ventana */
+    bottom: 20px; /* Separación desde la parte inferior */
+    right: 20px; /* Separación desde la parte derecha */
+    padding: 10px 20px;
+    background-color: #28a745; /* Verde para guardar */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-/* Estilo para el botón de Log In */
-.top-buttons .login-btn {
-    background-color: #007bff; /* Azul para Log In */
+.save-btn:hover {
+    background-color: #218838; /* Verde más oscuro */
 }
-
-.top-buttons .login-btn:hover {
-    background-color: #0056b3; /* Azul más oscuro */
-}
-
-/* Estilo para el botón de Sign Up */
-.top-buttons .signup-btn {
-    background-color: rgba(108, 117, 125, 0.2); /* Gris semitransparente */
-    color: #333; /* Texto gris */
-}
-
-.top-buttons .signup-btn:hover {
-    background-color: rgba(108, 117, 125, 0.4); /* Gris más oscuro */
-}
-

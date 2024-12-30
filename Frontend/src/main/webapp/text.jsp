@@ -15,12 +15,18 @@
         <title>Editor Markdown</title>
     </head>
     <body>
+        <div class="top-buttons" align="right">
+            <button type="button" class="login-menu-btn" onclick="window.location.href='login.jsp'">Log In</button>
+            <button type="button" class="signup-menu-btn" onclick="window.location.href='signUp.jsp'">Sign Up</button>
+        </div>
+
         <div class="editor-container">
+            
             <h1>Editor Markdown</h1>
             <form id="markdownForm" action="text" method="post">
                 <textarea id="markdown-editor" name="markdownContent"></textarea>
                 <div class="form-footer">
-                    <select id="exportFormat" name="exportFormat" class="export-button" class="export-button" onchange="submitForm()">
+                    <select id="exportFormat" name="exportFormat" class="export-button" onchange="submitForm()">
                         <option value="" disabled selected>Exportar</option>
                         <option value="html">HTML</option>
                         <option value="pdf">PDF</option>
@@ -28,6 +34,8 @@
                 </div>
             </form>
         </div>
+        <button type="button" class="save-btn">Guardar</button>
+
         <script>
             function submitForm() {
                 const form = document.getElementById("markdownForm");
