@@ -21,6 +21,12 @@ import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 import com.itextpdf.html2pdf.HtmlConverter;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 /**
  *
@@ -105,4 +111,129 @@ private void generarPdfDesdeHtml(String htmlContent, OutputStream outputStream) 
         throw new Exception("Error al generar el PDF", e);
     }
 }
+
+
+@Path("downloaddocx")
+@POST
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+public Response download_docx(String JSONmarkdownContent) {
+    try {
+        JsonReader reader = Json.createReader(new StringReader(JSONmarkdownContent));
+        JsonObject jsonObject = reader.readObject();
+        String markdownContent = jsonObject.getString("markdownContent");
+
+        String htmlContent = convertirMarkdownAHtml(markdownContent);
+
+        ByteArrayOutputStream docxOutputStream = new ByteArrayOutputStream();
+        generarDocxDesdeHtml(htmlContent, docxOutputStream);
+
+        InputStream archivoDocx = new ByteArrayInputStream(docxOutputStream.toByteArray());
+        return Response.ok(archivoDocx)
+                .header("Content-Disposition", "attachment; filename=documento.docx")
+                .type("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                .build();
+    } catch (Exception e) {
+        return Response.serverError().entity("Error al generar el archivo DOCX").build();
+    }
+}
+
+private void generarDocxDesdeHtml(String htmlContent, OutputStream outputStream) throws Exception {
+    try {
+        // Crear un documento en blanco usando Apache POI
+        XWPFDocument document = new XWPFDocument();
+
+        // Usar Jsoup para analizar el HTML
+        Document doc = Jsoup.parse(htmlContent);
+
+        // Procesar encabezados
+        for (Element header : doc.select("h1, h2, h3, h4, h5, h6")) {
+            XWPFParagraph paragraph = document.createParagraph();
+            XWPFRun run = paragraph.createRun();
+            run.setText(header.text());
+
+            // Formato según el nivel del encabezado
+            switch (header.tagName()) {
+                case "h1":
+                    run.setBold(true);
+                    run.setFontSize(18);
+                    break;
+                case "h2":
+                    run.setBold(true);
+                    run.setFontSize(16);
+                    break;
+                case "h3":
+                    run.setBold(true);
+                    run.setFontSize(14);
+                    break;
+                case "h4":
+                    run.setBold(true);
+                    run.setFontSize(12);
+                    break;
+                case "h5":
+                    run.setBold(true);
+                    run.setFontSize(10);
+                    break;
+                case "h6":
+                    run.setBold(true);
+                    run.setFontSize(8);
+                    break;
+            }
+        }
+
+        // Procesar párrafos
+        for (Element paragraph : doc.select("p")) {
+            XWPFParagraph xwpfParagraph = document.createParagraph();
+
+            // Procesar contenido dentro del párrafo
+            for (Element child : paragraph.children()) {
+                XWPFRun run = xwpfParagraph.createRun();
+
+                // Formato según las etiquetas internas
+                if (child.tagName().equals("strong")) {
+                    run.setBold(true);
+                    run.setText(child.text());
+                } else if (child.tagName().equals("em")) {
+                    run.setItalic(true);
+                    run.setText(child.text());
+                } else if (child.tagName().equals("strong") && child.tagName().equals("em")) {
+                    run.setBold(true);
+                    run.setItalic(true);
+                    run.setText(child.text());
+                } else {
+                    run.setText(child.text());
+                }
+            }
+
+            // Si no hay hijos, añadir texto directamente
+            if (paragraph.children().isEmpty()) {
+                XWPFRun run = xwpfParagraph.createRun();
+                run.setText(paragraph.text());
+            }
+        }
+
+        // Procesar listas enumeradas y desordenadas
+        for (Element list : doc.select("ul, ol")) {
+            for (Element listItem : list.select("li")) {
+                XWPFParagraph listParagraph = document.createParagraph();
+                XWPFRun run = listParagraph.createRun();
+
+                // Determinar tipo de lista
+                if (list.tagName().equals("ul")) {
+                    run.setText("• " + listItem.text());
+                } else if (list.tagName().equals("ol")) {
+                    // Puede agregar numeración manual si se requiere
+                    run.setText(listItem.text());
+                }
+            }
+        }
+
+        // Escribir el contenido en el OutputStream
+        document.write(outputStream);
+        document.close();
+    } catch (Exception e) {
+        throw new Exception("Error al generar el archivo DOCX", e);
+    }
+}
+
 }
