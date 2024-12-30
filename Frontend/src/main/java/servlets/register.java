@@ -83,7 +83,7 @@ public class register extends HttpServlet {
         String password = request.getParameter("password");
         String confirmPass = request.getParameter("confirm-password");
         
-        if (!confirmPass.equals("password")) {
+        if (!confirmPass.equals(password)) {
             request.setAttribute("TError", "register_error_password");
             RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
             rd.forward(request, response);
