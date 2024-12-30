@@ -27,6 +27,9 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.OutputStream;
 
 /**
  *
@@ -58,9 +61,9 @@ public class JakartaEE91Resource {
         JsonReader reader = Json.createReader(new StringReader(JSONmarkdownContent));
         JsonObject jsonObject = reader.readObject();
         String markdownContent = jsonObject.getString("markdownContent");
-        //System.out.println(markdownContent);
+        System.out.println(markdownContent);
         String htmlResponse = convertirMarkdownAHtml(markdownContent);
-        //System.out.println(htmlResponse);
+        System.out.println(htmlResponse);
         InputStream archivoHtml = new ByteArrayInputStream(htmlResponse.getBytes());
         return Response.ok(archivoHtml)
                 .header("Content-Disposition", "attachment; filename=documento.html") 
@@ -138,21 +141,24 @@ public Response download_docx(String JSONmarkdownContent) {
     }
 }
 
-private void generarDocxDesdeHtml(String htmlContent, OutputStream outputStream) throws Exception {
+
+public void generarDocxDesdeHtml(String htmlContent, OutputStream outputStream) throws Exception {
     try {
         // Crear un documento en blanco usando Apache POI
         XWPFDocument document = new XWPFDocument();
 
-        // Usar Jsoup para analizar el HTML
+        // Parsear el contenido HTML usando Jsoup
         Document doc = Jsoup.parse(htmlContent);
 
-        // Procesar encabezados
+        // Manejar encabezados (h1-h6)
         for (Element header : doc.select("h1, h2, h3, h4, h5, h6")) {
             XWPFParagraph paragraph = document.createParagraph();
             XWPFRun run = paragraph.createRun();
-            run.setText(header.text());
 
-            // Formato según el nivel del encabezado
+            String headerText = header.text();
+            run.setText(headerText);
+
+            // Aplicar estilos dependiendo del nivel del encabezado
             switch (header.tagName()) {
                 case "h1":
                     run.setBold(true);
@@ -181,50 +187,19 @@ private void generarDocxDesdeHtml(String htmlContent, OutputStream outputStream)
             }
         }
 
-        // Procesar párrafos
+        // Manejar párrafos
         for (Element paragraph : doc.select("p")) {
             XWPFParagraph xwpfParagraph = document.createParagraph();
-
-            // Procesar contenido dentro del párrafo
-            for (Element child : paragraph.children()) {
-                XWPFRun run = xwpfParagraph.createRun();
-
-                // Formato según las etiquetas internas
-                if (child.tagName().equals("strong")) {
-                    run.setBold(true);
-                    run.setText(child.text());
-                } else if (child.tagName().equals("em")) {
-                    run.setItalic(true);
-                    run.setText(child.text());
-                } else if (child.tagName().equals("strong") && child.tagName().equals("em")) {
-                    run.setBold(true);
-                    run.setItalic(true);
-                    run.setText(child.text());
-                } else {
-                    run.setText(child.text());
-                }
-            }
-
-            // Si no hay hijos, añadir texto directamente
-            if (paragraph.children().isEmpty()) {
-                XWPFRun run = xwpfParagraph.createRun();
-                run.setText(paragraph.text());
-            }
+            XWPFRun run = xwpfParagraph.createRun();
+            processInlineStyles(paragraph, run);
         }
 
-        // Procesar listas enumeradas y desordenadas
+        // Manejar listas ordenadas y desordenadas
         for (Element list : doc.select("ul, ol")) {
             for (Element listItem : list.select("li")) {
                 XWPFParagraph listParagraph = document.createParagraph();
                 XWPFRun run = listParagraph.createRun();
-
-                // Determinar tipo de lista
-                if (list.tagName().equals("ul")) {
-                    run.setText("• " + listItem.text());
-                } else if (list.tagName().equals("ol")) {
-                    // Puede agregar numeración manual si se requiere
-                    run.setText(listItem.text());
-                }
+                run.setText("• " + listItem.text()); // Usa "•" para listas desordenadas
             }
         }
 
@@ -235,5 +210,22 @@ private void generarDocxDesdeHtml(String htmlContent, OutputStream outputStream)
         throw new Exception("Error al generar el archivo DOCX", e);
     }
 }
+
+private void processInlineStyles(Element element, XWPFRun run) {
+    Elements strongs = element.select("strong");
+    Elements ems = element.select("em");
+
+    if (!strongs.isEmpty() && !ems.isEmpty()) {
+        run.setBold(true);
+        run.setItalic(true);
+    } else if (!strongs.isEmpty()) {
+        run.setBold(true);
+    } else if (!ems.isEmpty()) {
+        run.setItalic(true);
+    }
+
+    run.setText(element.text());
+}
+
 
 }

@@ -30,6 +30,7 @@
                         <option value="" disabled selected>Exportar</option>
                         <option value="html">HTML</option>
                         <option value="pdf">PDF</option>
+                        <option value="docx">DOCX</option>
                     </select>
                 </div>
             </form>

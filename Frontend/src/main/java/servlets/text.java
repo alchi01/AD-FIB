@@ -92,6 +92,7 @@ public class text extends HttpServlet {
         
         if (format.equals("pdf")) apiUrl += "downloadpdf";
         else if (format.equals("html")) apiUrl += "downloadhtml";
+        else if (format.equals("docx")) apiUrl += "downloaddocx";
         
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -114,6 +115,10 @@ public class text extends HttpServlet {
             else if (format.equals("html")) {
                 response.setContentType("text/html");
                 response.setHeader("Content-Disposition", "attachment; filename=documento.html");
+            }
+            else if (format.equals("docx")) {
+                response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+                response.setHeader("Content-Disposition", "attachment; filename=documento.docx");
             }
             InputStream inputStream = connection.getInputStream();
             OutputStream outputStream = response.getOutputStream();
