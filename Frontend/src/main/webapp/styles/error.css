@@ -1,0 +1,62 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 30 dic 2024, 21:35:50
+    Author     : alumne
+*/
+/* Contenedor principal del error */
+.error-container {
+    width: 80%;
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: #f8d7da; /* Fondo rojo claro para indicar error */
+    border: 1px solid #f5c6cb; /* Borde rojo suave */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Título de error */
+.error-container h2 {
+    font-size: 22px;
+    color: #721c24; /* Rojo oscuro para el título de error */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Mensajes de error */
+.error-message {
+    font-size: 16px;
+    color: #721c24;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Estilo para los botones */
+.error-button {
+    display: block;
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #007bff; /* Azul para el botón */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+/* Efecto hover del botón */
+.error-button:hover {
+    background-color: #0056b3; /* Azul más oscuro */
+}
+
+/* Asegurar que el botón no se deforme al hacer hover */
+.error-button:focus {
+    outline: none; /* Eliminar el borde de enfoque */
+}
