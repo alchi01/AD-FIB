@@ -1,5 +1,5 @@
 package test.backend.resources;
-
+import DB.database;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
@@ -44,6 +44,39 @@ public class JakartaEE91Resource {
                 .ok("ping Jakarta EE")
                 .build();
     }
+    
+ @Path("login")
+ @POST
+ @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+ @Produces(MediaType.APPLICATION_JSON)
+ public Response login(@FormParam("username") String username,
+                       @FormParam("password") String password) {
+     
+     database db = new database();
+     
+     if (db.login(username,password)) 
+          return Response.ok().build();
+     else  
+         return Response.status(Response.Status.UNAUTHORIZED).build();
+ }
+ 
+ @Path("register")
+ @POST
+ @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+ @Produces(MediaType.APPLICATION_JSON)
+ public Response register(@FormParam("username") String username,
+                          @FormParam("email") String email,
+                          @FormParam("password") String password) {
+     
+     database db = new database();
+     
+     if (db.register(username,password,email)) 
+          return Response.ok().build();
+     else  
+         return Response.status(Response.Status.UNAUTHORIZED).build();
+ }
+
+    
     
     /**
  * POST method to login in the application
