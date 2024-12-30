@@ -42,6 +42,11 @@
             <artifactId>jsoup</artifactId>
             <version>1.15.3</version> <!-- Usa la versión más reciente disponible -->
         </dependency>
+        <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20210307</version>
+    </dependency>
     </dependencies>
     
     <build>

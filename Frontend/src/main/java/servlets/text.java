@@ -17,7 +17,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import jakarta.servlet.http.HttpSession;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import jakarta.servlet.RequestDispatcher;
+import org.json.JSONObject;
+
+
 
 /**
  *
@@ -78,7 +84,91 @@ public class text extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = request.getParameter("action");
         String markdownContent = request.getParameter("markdownContent");
+         HttpSession session = request.getSession(false);
+        String user = (session != null) ? (String) session.getAttribute("user") : null;
+        System.out.println(user);
+
+        if ("guardar".equals(action)) {
+            // Crear la cadena de parámetros en formato "application/x-www-form-urlencoded"
+            String data = "markdown=" + URLEncoder.encode(markdownContent, "UTF-8")
+                        + "&username=" + URLEncoder.encode(user, "UTF-8");
+
+            // Nuevo endpoint para guardar el contenido
+            String apiUrl = "http://localhost:8080/Backend/resources/jakartaee9/saveContent";
+
+            // Conexión al endpoint
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setDoOutput(true);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                // Convertir la cadena a bytes y escribir en el cuerpo de la solicitud
+                byte[] input = data.getBytes("utf-8");
+                os.write(input, 0, input.length);
+                os.flush();
+            }
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                response.setContentType("text/plain");
+                response.getWriter().write("Contenido guardado exitosamente.");
+            } else {
+                response.setStatus(responseCode);
+                response.getWriter().write("Error al guardar el contenido.");
+            }
+
+            connection.disconnect();
+            return;
+        }
+        else if ("cargar".equals(action)) {
+            // Lógica para cargar el contenido desde el backend
+            String apiUrl = "http://localhost:8080/Backend/resources/jakartaee9/loadContent"; // Endpoint de carga
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+
+            // Enviar los parámetros de usuario en el cuerpo de la solicitud, si es necesario
+            String data = "username=" + URLEncoder.encode(user, "UTF-8");
+            connection.setDoOutput(true);
+            try (OutputStream os = connection.getOutputStream()) {
+                os.write(data.getBytes("UTF-8"));
+                os.flush();
+            }
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream inputStream = connection.getInputStream();
+                StringBuilder content = new StringBuilder();
+                int byteRead;
+                while ((byteRead = inputStream.read()) != -1) {
+                    content.append((char) byteRead);
+                }
+                        
+               // Convertir el contenido del archivo en un objeto JSON
+                JSONObject jsonObject = new JSONObject(content.toString());
+
+                // Extraer el valor del campo "content"
+                String markdown = jsonObject.getString("content");
+                System.out.println(jsonObject);
+                // Colocar el contenido en la solicitud como atributo
+                request.setAttribute("markdownContent", markdown.toString());
+
+                // Redirigir a la misma página (por ejemplo, text.jsp) con el contenido cargado
+                RequestDispatcher dispatcher = request.getRequestDispatcher("text.jsp");
+                dispatcher.forward(request, response);
+            } else {
+                response.getWriter().write("Error al cargar el contenido.");
+            }
+
+            connection.disconnect();
+            return;
+        }
+
+        
         String format = request.getParameter("exportFormat");
         
         System.out.println();

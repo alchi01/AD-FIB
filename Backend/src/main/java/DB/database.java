@@ -6,6 +6,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.IOException;
+import org.json.JSONObject;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -97,85 +102,70 @@ public class database {
         
         return isRegistered;
     }
-    public boolean save(String markdown, String user) {
-        Connection connection = null;
-        boolean isSaved = false; 
-        
-        try {
-             Class.forName("org.apache.derby.jdbc.ClientDriver");
+    public boolean save(String markdown, String username) {
+         boolean isSaved = false; 
 
-            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr5;user=pr5;password=pr5");
-            String sql = "INSERT INTO DOCUMENTOS (ID_USUARIO, CONTENT) VALUES (?, ?)";
+         try {
+             // Crear el objeto JSON con el contenido
+             JSONObject jsonObject = new JSONObject();
+             jsonObject.put("username", username);
+             jsonObject.put("content", markdown);
 
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, user);
-            statement.setString(2, markdown);
+             // Definir el directorio temporal del backend
+             String tempDir = System.getProperty("java.io.tmpdir");
+             System.out.println(tempDir);
+             File jsonFile = new File(tempDir, username + ".json");
 
+             // Escribir el JSON en el archivo
+             try (FileWriter writer = new FileWriter(jsonFile)) {
+                 writer.write(jsonObject.toString(4)); // Indentación de 4 espacios para mejor legibilidad
+             }
 
-            int rowsInserted = statement.executeUpdate();
-            if (rowsInserted > 0) {
-                isSaved = true; 
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("ClassNotFoundException: " + e.getMessage());
-        }
-        catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-        }finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                // connection close failed.
-                System.err.println(e.getMessage());
-           }
-        }
-        
-        return isSaved;
-    }
+             // Confirmar que el archivo fue guardado exitosamente
+             if (jsonFile.exists()) {
+                 isSaved = true;
+             }
+         } catch (IOException e) {
+             System.out.println("IOException: " + e.getMessage());
+         }
+
+         return isSaved;
+     }
     
     public String load(String user) {
-       Connection connection = null;
-    String markdown = ""; // Aquí almacenaremos el contenido del markdown
-    
+        String markdown = ""; // Variable para almacenar el contenido del campo "content"
+
         try {
-            // Cargar el driver de la base de datos (JDBC)
-            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            // Obtener el directorio temporal del sistema
+            String tempDir = System.getProperty("java.io.tmpdir");
+            File jsonFile = new File(tempDir, user + ".json");
 
-            // Establecer conexión con la base de datos
-            connection = DriverManager.getConnection("jdbc:derby://localhost:1527/pr5;user=pr5;password=pr5");
-
-            // SQL para obtener el campo CONTENT relacionado con el ID_USUARIO
-            String sql = "SELECT CONTENT FROM DOCUMENTOS WHERE ID_USUARIO = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, user); // Establecer el parámetro ID_USUARIO en la consulta
-
-            // Ejecutar la consulta y obtener el resultado
-            ResultSet rs = statement.executeQuery();
-
-            // Si hay un resultado, obtener el contenido del campo CONTENT
-            if (rs.next()) {
-                markdown = rs.getString("CONTENT"); // Obtener el contenido de la columna CONTENT
+            // Verificar si el archivo existe
+            if (!jsonFile.exists()) {
+                System.out.println("Archivo no encontrado: " + jsonFile.getAbsolutePath());
+                return markdown; // Retornar vacío si el archivo no existe
             }
-        }
-        catch (ClassNotFoundException e) {
-            System.out.println("ClassNotFoundException: " + e.getMessage());
-        }
-        catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-        }finally {
-            try {
-                if (connection != null) {
-                    connection.close();
+
+            // Leer el archivo JSON
+            try (FileReader reader = new FileReader(jsonFile)) {
+                StringBuilder jsonContent = new StringBuilder();
+                int c;
+                while ((c = reader.read()) != -1) {
+                    jsonContent.append((char) c);
                 }
-            } catch (SQLException e) {
-                // connection close failed.
-                System.err.println(e.getMessage());
-           }
+
+                // Convertir el contenido del archivo en un objeto JSON
+                JSONObject jsonObject = new JSONObject(jsonContent.toString());
+
+                // Extraer el valor del campo "content"
+                markdown = jsonObject.getString("content");
+                System.out.println(jsonObject);
+            }
+        } catch (IOException e) {
+            System.out.println("IOException: " + e.getMessage());
         }
-        
+
         return markdown;
     }
-    
+
 }

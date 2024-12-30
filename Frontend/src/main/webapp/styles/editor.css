@@ -140,20 +140,21 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     background-color: rgba(108, 117, 125, 0.4);
 }
 
-.save-btn {
-    position: fixed; /* Posiciona el botón de forma fija en la ventana */
-    bottom: 20px; /* Separación desde la parte inferior */
-    right: 20px; /* Separación desde la parte derecha */
-    padding: 10px 20px;
-    background-color: #28a745; /* Verde para guardar */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.save-btn, .load-btn {
+    background-color: #4CAF50; /* Color de fondo verde */
+    color: white; /* Texto blanco */
+    padding: 10px 20px; /* Espaciado interno */
+    text-align: center; /* Alinear el texto al centro */
+    text-decoration: none; /* Eliminar subrayado */
+    display: inline-block; /* Mostrar el botón en línea */
+    font-size: 16px; /* Tamaño de la fuente */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambiar el cursor al pasar sobre el botón */
+    transition: background-color 0.3s ease; /* Efecto de transición al pasar el ratón */
 }
 
-.save-btn:hover {
+
+.save-btn, .load-btn :hover {
     background-color: #218838; /* Verde más oscuro */
 }

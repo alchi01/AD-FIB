@@ -28,6 +28,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.json.JSONObject;
 
 import java.io.OutputStream;
 
@@ -75,9 +76,43 @@ public class JakartaEE91Resource {
      else  
          return Response.status(Response.Status.UNAUTHORIZED).build();
  }
+ 
+ @Path("saveContent")
+ @POST
+ @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+ @Produces(MediaType.APPLICATION_JSON)
+ public Response save(@FormParam("markdown") String markdown,
+                       @FormParam("username") String username) {
+     
+     database db = new database();
+     
+     if (db.save(markdown,username)) 
+          return Response.ok().build();
+     else  
+         return Response.status(Response.Status.UNAUTHORIZED).build();
+ }
+ 
+ @Path("loadContent")
+ @POST
+ @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+ @Produces(MediaType.APPLICATION_JSON)
+ public Response load (@FormParam("username") String username) {
+     
+     database db = new database();
+     
+     String markdown = db.load(username);
+
+        // Crear un JSONObject con el contenido cargado
+        JSONObject responseJson = new JSONObject();
+        responseJson.put("content", markdown); // Agregar el campo "content" con el markdown
+
+        // Retornar el JSON como respuesta
+        return Response.ok(responseJson.toString()).build();
+    }
 
     
     
+
     /**
  * POST method to login in the application
      * @param JSONmarkdownContent
